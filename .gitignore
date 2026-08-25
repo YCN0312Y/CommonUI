@@ -1,0 +1,44 @@
+# ---------- UE 生成文件 ----------
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+# 每用户编辑器设置，不应提交
+Config/DefaultEditorPerProjectUserSettings.ini
+*.pdb
+*.ilk
+*.obj
+*.lib
+*.dll
+*.exe
+*.so
+*.dylib
+*.exp
+*.map
+*.idb
+*.cache
+
+# ---------- Visual Studio ----------
+.vs/
+*.suo
+*.userprefs
+*.user
+*.VC.db
+*.VC.opendb
+*.opensdf
+*.sdf
+*.sln.docstates
+
+# ---------- VS Code / 其它 IDE ----------
+.vscode/
+.idea/
+*.code-workspace
+
+# ---------- 操作系统 / 杂项 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.temp
+

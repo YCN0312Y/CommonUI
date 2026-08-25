@@ -1,0 +1,31 @@
+# =============================================================
+# Unreal Engine 项目 .gitattributes
+# 让 git 正确处理 UE 的二进制资源，并统一文本换行符
+# =============================================================
+
+# UE 资源文件是二进制，禁止 diff / 换行转换
+*.uasset binary
+*.umap    binary
+*.uexp    binary
+*.ubulk   binary
+*.uplugin binary
+
+# 文本文件统一用 LF（git 内部），检出时 Windows 用 CRLF
+* text=auto
+*.cpp text eol=crlf
+*.h   text eol=crlf
+*.cs  text eol=crlf
+*.ini text eol=crlf
+*.cfg text eol=crlf
+*.py  text eol=lf
+*.sh  text eol=lf
+
+# 这些强制当作二进制，避免被 diff 破坏
+*.dll binary
+*.pdb binary
+*.exe binary
+*.so  binary
+*.dylib binary
+*.png binary
+*.jpg binary
+*.ico binary
