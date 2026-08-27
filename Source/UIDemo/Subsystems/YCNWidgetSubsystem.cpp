@@ -39,7 +39,9 @@ void UYCNWidgetSubsystem::RegisterCreateMainLayoutWidget(UYCNWidget_MainLayout* 
 	Debug::Print(TEXT("CreateMainLayout已保存"));
 }
 
-void UYCNWidgetSubsystem::PushSoftWidgetToStackAynsc(const FGameplayTag& InWidgetStackTag, TSoftClassPtr<UYCNWidget_ActivatableBase> InSoftWidgetClass, TFunction<void(EAsyncPushWidgetState, UYCNWidget_ActivatableBase*)> AysncPushStateCallback)
+void UYCNWidgetSubsystem::PushSoftWidgetToStackAynsc(const FGameplayTag& InWidgetStackTag, 
+	TSoftClassPtr<UYCNWidget_ActivatableBase> InSoftWidgetClass, 
+	TFunction<void(EAsyncPushWidgetState, UYCNWidget_ActivatableBase*)> AysncPushStateCallback)
 {
 	if (InSoftWidgetClass.IsNull())return;
 
@@ -52,15 +54,19 @@ void UYCNWidgetSubsystem::PushSoftWidgetToStackAynsc(const FGameplayTag& InWidge
 				UClass* LoadedClass = InSoftWidgetClass.Get();
 				if (LoadedClass && CreateMainLayout)
 				{
+					//根据标签获取到可激活的控件堆栈
 					UCommonActivatableWidgetContainerBase* FoundWidgetStack = CreateMainLayout->FindWidgetStackByTag(InWidgetStackTag);
+					//再向这个可激活的控件堆栈里面添加已经激活的控件
 					UYCNWidget_ActivatableBase * CreateWidget = FoundWidgetStack->AddWidget<UYCNWidget_ActivatableBase>(
 						LoadedClass,
 						[AysncPushStateCallback](UYCNWidget_ActivatableBase& CreatedWidget)
 						{
-							AysncPushStateCallback(EAsyncPushWidgetState::OnCreateBeforePush, &CreatedWidget);
+							//创建LoadedClass控件
+							AysncPushStateCallback(EAsyncPushWidgetState::CreateWidget, &CreatedWidget);
 
 						});
-					AysncPushStateCallback(EAsyncPushWidgetState::AfterPush, CreateWidget);
+					//把刚创建的控件推送到堆栈
+					AysncPushStateCallback(EAsyncPushWidgetState::PushWidget, CreateWidget);
 				}
 			})
 	);

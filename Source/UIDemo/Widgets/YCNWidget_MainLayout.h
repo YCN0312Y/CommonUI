@@ -24,7 +24,7 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = YCNWidget)
 	void RegisteredWidgetStack(UPARAM(meta = (Categories = "YCN.WidgetStack")) FGameplayTag InStackTag, UCommonActivatableWidgetContainerBase* WidgetStack);
 
-public:
+public:	
 	//根据标签查找控件堆栈
 	UCommonActivatableWidgetContainerBase* FindWidgetStackByTag(const FGameplayTag& InTag)const;
 

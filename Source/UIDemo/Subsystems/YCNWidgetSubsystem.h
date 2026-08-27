@@ -14,10 +14,10 @@ struct FGameplayTag;
 //异步推送状态
 enum class EAsyncPushWidgetState :uint8
 {
-	//在推送前创建
-	OnCreateBeforePush,
-	//在推送后创建
-	AfterPush
+	//创建控件
+	CreateWidget,
+	//推送控件
+	PushWidget
 };
 
 UCLASS()

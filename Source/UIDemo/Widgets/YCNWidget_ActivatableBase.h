@@ -6,9 +6,17 @@
 #include "CommonActivatableWidget.h"
 #include "YCNWidget_ActivatableBase.generated.h"
 
+class AYCNPlayerController;
+
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
 class UIDEMO_API UYCNWidget_ActivatableBase : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 	
+private:
+	TWeakObjectPtr<AYCNPlayerController>CachedOwningPC;
+
+protected:
+	UFUNCTION(BlueprintPure)
+	AYCNPlayerController* GetCachedOwningPC();
 };
