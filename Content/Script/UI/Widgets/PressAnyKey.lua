@@ -6,6 +6,8 @@
 -- @DATE ${date} ${time}
 --
 
+local WidgetBlueprintLibrary = UE.UWidgetBlueprintLibrary
+
 ---@type WBP_CAW_PressAnyKey_C
 local M = UnLua.Class()
 
@@ -25,13 +27,15 @@ end
 --end
 
 function M:OnMouseButtonDown(MyGeometry, MouseEvent)
+    local Reply = WidgetBlueprintLibrary.Handled()
     self:PushMainMenu()
-    return self:Handled()
+    return Reply
 end
 
 function M:OnKeyDown(MyGeometry, InKeyEvent)
+    local Reply = WidgetBlueprintLibrary.Handled()
     self:PushMainMenu()
-    return self:Handled()
+    return Reply 
 end
 
 function M:BP_GetDesiredFocusTarget()

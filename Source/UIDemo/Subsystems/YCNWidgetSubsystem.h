@@ -8,6 +8,7 @@
 
 class UYCNWidget_MainLayout;
 class UYCNWidget_ActivatableBase;
+class UYCNCommonButtonBase;
 
 struct FGameplayTag;
 
@@ -19,6 +20,8 @@ enum class EAsyncPushWidgetState :uint8
 	//推送控件
 	PushWidget
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnButtonDescriptionTextUpdate, UYCNCommonButtonBase*, BroadCastingButton, FText, DescriptionText);
 
 UCLASS()
 class UIDEMO_API UYCNWidgetSubsystem : public UGameInstanceSubsystem
@@ -35,6 +38,11 @@ private:
 	UPROPERTY()
 	UYCNWidget_MainLayout* CreateMainLayout;
 
+public:
+	// (触碰/点击) 按钮时显示描述文本
+	UPROPERTY(BlueprintAssignable)
+	FOnButtonDescriptionTextUpdate OnButtonDescriptionTextUpdate;
+		
 public:
 	//注册创建主布局组件
 	UFUNCTION(BlueprintCallable, Category = YCNWidget, meta = (DisplayName = "注册创建主布局组件"))

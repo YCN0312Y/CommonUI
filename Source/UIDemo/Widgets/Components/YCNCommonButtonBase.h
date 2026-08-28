@@ -16,6 +16,8 @@ class UIDEMO_API UYCNCommonButtonBase : public UCommonButtonBase
 protected:
 	virtual void NativePreConstruct()override;
 	virtual void NativeOnCurrentTextStyleChanged() override;
+	virtual void NativeOnHovered()override;
+	virtual void NativeOnUnhovered()override;
 	
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
