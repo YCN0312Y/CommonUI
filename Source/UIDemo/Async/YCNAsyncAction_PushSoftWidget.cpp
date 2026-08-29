@@ -2,7 +2,7 @@
 
 #include "UIDemo/Async/YCNAsyncAction_PushSoftWidget.h"
 #include "UIDemo/Subsystems/YCNWidgetSubsystem.h"
-#include "UIDemo/Widgets/YCNWidget_ActivatableBase.h"
+#include "UIDemo/Widgets/ActivatableWidget/YCNWidget_ActivatableBase.h"
 
 #include "UIDemo/YCNDebugHelper.h"
 
@@ -30,6 +30,7 @@ void UYCNAsyncAction_PushSoftWidget::Activate()
 					}
 				}
 
+				//销毁异步任务
 				SetReadyToDestroy();
 				break;
 			}

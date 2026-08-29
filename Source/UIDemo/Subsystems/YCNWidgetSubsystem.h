@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UIDemo/YCNEnumType.h"
 #include "YCNWidgetSubsystem.generated.h"
 
 class UYCNWidget_MainLayout;
 class UYCNWidget_ActivatableBase;
+class UYCNCommonButtonBase;
 class UYCNCommonButtonBase;
 
 struct FGameplayTag;
@@ -52,4 +54,10 @@ public:
 		const FGameplayTag& InWidgetStackTag, 
 		TSoftClassPtr<UYCNWidget_ActivatableBase>InSoftWidgetClass,
 		TFunction<void(EAsyncPushWidgetState, UYCNWidget_ActivatableBase*)> AysncPushStateCallback);
+	//异步将确认窗口推入栈中
+	void PushConfirmWindowToModalStackAynsc(
+		EConfirmWindowType InWindowType,
+		const FText& InWindowTitle,
+		const FText& InWindowMessage,
+		TFunction<void(EConfirmWindowButtonType)>ButtonClickedCallback);
 };

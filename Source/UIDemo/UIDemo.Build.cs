@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -15,7 +15,8 @@ public class UIDemo : ModuleRules
 			"InputCore", 
 			"EnhancedInput",
             "GameplayTags",
-			"UMG"
+			"UMG",
+			"CommonInput",
 
         });
 

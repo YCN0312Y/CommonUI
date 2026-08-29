@@ -3,8 +3,11 @@
 #include "UIDemo/Subsystems/YCNWidgetSubsystem.h"
 #include "Engine/AssetManager.h"
 #include "UIDemo/Widgets/YCNWidget_MainLayout.h"
-#include "UIDemo/Widgets/YCNWidget_ActivatableBase.h"
+#include "UIDemo/Widgets/ActivatableWidget/YCNWidget_ActivatableBase.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
+#include "UIDemo/Widgets/ActivatableWidget/YCNWidget_ConfirmWindow.h"
+#include "UIDemo/GameplayTags/YCNGameplayTags.h"
+#include "UIDemo/FunctionLibrary/YCNFunctionLibrary.h"
 
 #include "UIDemo/YCNDebugHelper.h"
 
@@ -69,5 +72,36 @@ void UYCNWidgetSubsystem::PushSoftWidgetToStackAynsc(const FGameplayTag& InWidge
 					AysncPushStateCallback(EAsyncPushWidgetState::PushWidget, CreateWidget);
 				}
 			})
+	);
+}
+
+void UYCNWidgetSubsystem::PushConfirmWindowToModalStackAynsc(
+	EConfirmWindowType InWindowType, 
+	const FText& InWindowTitle, const FText& InWindowMessage, 
+	TFunction<void(EConfirmWindowButtonType)> ButtonClickedCallback)
+{
+	UYCNConfirmWindowInfoObject* CreatedInfoObject = nullptr;
+
+	switch (InWindowType)
+	{
+	case EConfirmWindowType::OK:
+		CreatedInfoObject = UYCNConfirmWindowInfoObject::CreateOKWindow(InWindowTitle, InWindowMessage);
+		break;
+	case EConfirmWindowType::YesNo:
+		CreatedInfoObject = UYCNConfirmWindowInfoObject::CreateYesNoWindow(InWindowTitle, InWindowMessage);
+		break;
+	}
+
+	PushSoftWidgetToStackAynsc(
+		YCNGameplayTags::YCN_WidgetStack_Modal,
+		UYCNFunctionLibrary::GetSoftWidgetClassByTag(YCNGameplayTags::YCN_Widget_Confirm),
+		[CreatedInfoObject, ButtonClickedCallback](EAsyncPushWidgetState InPushState, UYCNWidget_ActivatableBase* InPushWidget)
+		{
+			UYCNWidget_ConfirmWindow* CreatedConfirmWindow = Cast<UYCNWidget_ConfirmWindow>(InPushWidget);
+			if (CreatedConfirmWindow)
+			{
+				CreatedConfirmWindow->InitConfirmWindow(CreatedInfoObject, ButtonClickedCallback);
+			}
+		}
 	);
 }
