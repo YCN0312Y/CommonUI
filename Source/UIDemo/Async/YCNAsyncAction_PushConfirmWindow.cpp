@@ -2,6 +2,8 @@
 
 #include "UIDemo/Async/YCNAsyncAction_PushConfirmWindow.h"
 #include "UIDemo/Subsystems/YCNWidgetSubsystem.h"
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
 
 void UYCNAsyncAction_PushConfirmWindow::Activate()
 {
@@ -34,11 +36,11 @@ UYCNAsyncAction_PushConfirmWindow* UYCNAsyncAction_PushConfirmWindow::PushConfir
 				Node->CachedWindowType = InWindowType;
 				Node->CachedWindowTitle = InWindowTitle;
 				Node->CachedWindowMessage = InWindowMessage;
-
 				Node->RegisterWithGameInstance(World);
 				return Node;
 			}
 		}
 	}
 	return nullptr;
+
 }

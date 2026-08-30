@@ -37,5 +37,4 @@ public:
 		EConfirmWindowType InWindowType,
 		FText InWindowTitle,
 		FText InWindowMessage);
-	
 };

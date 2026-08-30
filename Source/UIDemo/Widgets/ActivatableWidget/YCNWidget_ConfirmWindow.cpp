@@ -60,7 +60,7 @@ void UYCNWidget_ConfirmWindow::InitConfirmWindow(UYCNConfirmWindowInfoObject* In
 		DynamicEntryBox_Buttons->Reset<UYCNCommonButtonBase>(
 			[](UYCNCommonButtonBase& ExistingButton)
 			{
-				//清空ExistingButton 当前已拥有的按钮
+				//清空点击的所有回调事件
 				ExistingButton.OnClicked().Clear();
 			});
 	}
@@ -72,24 +72,22 @@ void UYCNWidget_ConfirmWindow::InitConfirmWindow(UYCNConfirmWindowInfoObject* In
 
 		switch (AvailableButtonInfo.ConfirmWindowButtonType)
 		{
-		case EConfirmWindowButtonType::Confirm:
-			InputActionRowHandle = ICommonInputModule::GetSettings().GetDefaultClickAction();
-			break;
 		case EConfirmWindowButtonType::Closed:
+			//默认返回键
 			InputActionRowHandle = ICommonInputModule::GetSettings().GetDefaultBackAction();
 			break;
 		case EConfirmWindowButtonType::Cencel:
 			InputActionRowHandle = ICommonInputModule::GetSettings().GetDefaultBackAction();
 			break;
 		}
-		UYCNCommonButtonBase* AddedButton = DynamicEntryBox_Buttons->CreateEntry<UYCNCommonButtonBase>();
+		UYCNCommonButtonBase* AddedButton = DynamicEntryBox_Buttons->CreateEntry<UYCNCommonButtonBase>();//创建条目
 		AddedButton->SetButtonText(AvailableButtonInfo.ButtonDisplayText);
-		AddedButton->SetTriggeredInputAction(InputActionRowHandle);
+		AddedButton->SetTriggeringInputAction(InputActionRowHandle);//设置
 		AddedButton->OnClicked().AddLambda(
 			[this, ClickedButtonCallback, AvailableButtonInfo]()
 			{
 				ClickedButtonCallback(AvailableButtonInfo.ConfirmWindowButtonType);
-				DeactivateWidget();
+				DeactivateWidget();//停用控件
 			});
 	}
 	if (DynamicEntryBox_Buttons->GetNumEntries() != 0)

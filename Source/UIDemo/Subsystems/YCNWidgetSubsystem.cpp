@@ -97,9 +97,11 @@ void UYCNWidgetSubsystem::PushConfirmWindowToModalStackAynsc(
 		UYCNFunctionLibrary::GetSoftWidgetClassByTag(YCNGameplayTags::YCN_Widget_Confirm),
 		[CreatedInfoObject, ButtonClickedCallback](EAsyncPushWidgetState InPushState, UYCNWidget_ActivatableBase* InPushWidget)
 		{
+			//将创建的控件转换成确认窗口类型
 			UYCNWidget_ConfirmWindow* CreatedConfirmWindow = Cast<UYCNWidget_ConfirmWindow>(InPushWidget);
 			if (CreatedConfirmWindow)
 			{
+				//初始化窗口
 				CreatedConfirmWindow->InitConfirmWindow(CreatedInfoObject, ButtonClickedCallback);
 			}
 		}
