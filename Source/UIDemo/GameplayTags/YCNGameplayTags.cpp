@@ -14,4 +14,5 @@ namespace YCNGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_PressAntKey, "YCN.Widget.PressAntKey");
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_MainMenu, "YCN.Widget.MainMenu");
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_Confirm, "YCN.Widget.Confirm");
+	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_Option, "YCN.Widget.Option");
 }

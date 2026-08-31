@@ -39,7 +39,6 @@ void UYCNWidgetSubsystem::RegisterCreateMainLayoutWidget(UYCNWidget_MainLayout* 
 	if (!InCreateMainLayout)return;
 	
 	CreateMainLayout = InCreateMainLayout;
-	Debug::Print(TEXT("CreateMainLayout已保存"));
 }
 
 void UYCNWidgetSubsystem::PushSoftWidgetToStackAynsc(const FGameplayTag& InWidgetStackTag, 

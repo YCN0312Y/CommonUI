@@ -18,6 +18,9 @@ function M:OnInitialized()
     if self.Button_Stroy then
         self.Button_Stroy.OnButtonBaseClicked:Add(self, M.OnClickedButton_Stroy)
     end
+        if self.Button_Options then
+        self.Button_Options.OnButtonBaseClicked:Add(self, M.OnClickedButton_Option)
+    end
 end
 
 --function M:PreConstruct(IsDesignTime)
@@ -49,7 +52,8 @@ function M:OnConfirmWindowButtonClicked(ButtonType)
     end
 end
 
-function M:OnClickedButton_Stroy()
+--故事回调函数
+function M:OnClickedButton_Stroy(Button)
 
     local CachedOwningPC = self:GetCachedOwningPC()
     local StoryWidgetTag = self.WidgetStackTags:Find("Story")
@@ -58,6 +62,23 @@ function M:OnClickedButton_Stroy()
         local StoryWidgetClass = YCNFunctionLibrary.GetSoftWidgetClassByTag(StoryWidgetTag)
         if StoryWidgetClass then
             local AsyncAction = UE.UYCNAsyncAction_PushSoftWidget.PushSoftWidget(self, CachedOwningPC, StoryWidgetClass, self.WidgetTag, true)
+            if AsyncAction then
+                AsyncAction:Activate()
+            end
+        end
+    end
+end
+
+--选项回调函数
+function M:OnClickedButton_Option(Button)
+
+    local CachedOwningPC = self:GetCachedOwningPC()
+    local OptionWidgetTag = self.WidgetStackTags:Find("Option")
+
+    if UE.UYCNAsyncAction_PushSoftWidget and CachedOwningPC and YCNFunctionLibrary and OptionWidgetTag then
+        local OptionWidgetClass = YCNFunctionLibrary.GetSoftWidgetClassByTag(OptionWidgetTag)
+        if OptionWidgetClass then
+            local AsyncAction = UE.UYCNAsyncAction_PushSoftWidget.PushSoftWidget(self, CachedOwningPC, OptionWidgetClass, self.WidgetTag, true)
             if AsyncAction then
                 AsyncAction:Activate()
             end

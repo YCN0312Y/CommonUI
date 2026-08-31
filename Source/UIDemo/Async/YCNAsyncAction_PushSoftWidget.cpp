@@ -42,11 +42,8 @@ UYCNAsyncAction_PushSoftWidget* UYCNAsyncAction_PushSoftWidget::PushSoftWidget(
 	TSoftClassPtr<UYCNWidget_ActivatableBase> InSoftWidgetCLass, 
 	UPARAM(meta = (Categories = "YCN.WidgetStack")) FGameplayTag InWidgetStackTag, bool bFocusOnNewlyPushedWidget)
 {
-	if (InSoftWidgetCLass.IsNull())
-	{
-		Debug::Print(TEXT("向堆栈推送软引用时软引用为空"));
-		return nullptr;
-	}
+	if (InSoftWidgetCLass.IsNull()) return nullptr;
+	
 	if (GEngine)
 	{
 		UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
