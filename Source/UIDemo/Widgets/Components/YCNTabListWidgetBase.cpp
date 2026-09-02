@@ -15,3 +15,15 @@ void UYCNTabListWidgetBase::ValidateCompiledDefaults(IWidgetCompilerLog& Compile
 	}
 }
 #endif
+
+void UYCNTabListWidgetBase::RequestRegisterTab(const FName& InTabID, const FText& InTabDisplayText)
+{
+	//注册标签
+	RegisterTab(InTabID, TabButtonEntryWidgetClass, nullptr, INDEX_NONE);
+
+	UYCNCommonButtonBase* FoundButton = Cast<UYCNCommonButtonBase>(GetTabButtonBaseByID(InTabID));
+	if (FoundButton)
+	{
+		FoundButton->SetButtonText(InTabDisplayText);
+	}
+}

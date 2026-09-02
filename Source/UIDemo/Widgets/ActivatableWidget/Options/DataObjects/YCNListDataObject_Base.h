@@ -20,7 +20,7 @@ private:
 	//数据ID
 	FName DataID;
 	//数据显示名称
-	FName DataDisplayName;
+	FText DataDisplayName;
 	//富文本描述
 	FText DescriptionRichText;
 	//禁用时的富文本
@@ -43,7 +43,7 @@ public:
 	void InitDataObject();
 
 	LIST_DATA_ACCESSOR(FName, DataID);
-	LIST_DATA_ACCESSOR(FName, DataDisplayName);
+	LIST_DATA_ACCESSOR(FText, DataDisplayName);
 	LIST_DATA_ACCESSOR(FText, DescriptionRichText);
 	LIST_DATA_ACCESSOR(FText, DisabledRichText);
 	LIST_DATA_ACCESSOR(TSoftObjectPtr<UTexture2D>, SoftDescriptionImage);

@@ -25,4 +25,8 @@ private:
 	//主标签类
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "YCN Widget", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UYCNCommonButtonBase>TabButtonEntryWidgetClass;
+
+public:
+	//请求注册标签
+	void RequestRegisterTab(const FName& InTabID, const FText& InTabDisplayText);
 };
