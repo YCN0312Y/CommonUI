@@ -17,6 +17,8 @@ public class UIDemo : ModuleRules
             "GameplayTags",
 			"UMG",
 			"CommonInput",
+            "Slate",
+			"SlateCore",
 
         });
 

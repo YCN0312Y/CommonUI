@@ -8,6 +8,7 @@
 
 class UYCNOptionsDataRegistry;
 class UYCNTabListWidgetBase;
+class UYCNCommonListViewBase;
 
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
 class UIDEMO_API UYCNWidget_Options : public UYCNWidget_ActivatableBase
@@ -21,12 +22,14 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UYCNTabListWidgetBase>TabList_OptionsTabs;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UYCNCommonListViewBase>CommonListView_OptionsList;
 	//重置按钮
 	UPROPERTY(EditDefaultsOnly, Category = "YCN Option", meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"))
 	FDataTableRowHandle ResetAction;
 	//重置操作句柄
 	FUIActionBindingHandle ResetActionHandle;
-	//拥有的注册的数据
+	//注册数据
 	UPROPERTY(Transient)
 	TObjectPtr<UYCNOptionsDataRegistry>CreateOwningDataRegistry;
 private:
@@ -34,6 +37,7 @@ private:
 	void OnResetBoundActionTriggered();
 	//返回
 	void OnBackBoundActionTriggered();
+	//获取所属的数据注册表
 	UYCNOptionsDataRegistry* GetOwningDataRegistry();
 	UFUNCTION()
 	void OnOptionsTabSelected(FName TabID);

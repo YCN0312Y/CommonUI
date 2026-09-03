@@ -3,6 +3,7 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/YCNWidget_Options.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNOptionsDataRegistry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
+#include "UIDemo/Widgets/Components/YCNCommonListViewBase.h"
 #include "UIDemo/Widgets/Components/YCNTabListWidgetBase.h"
 #include "Input/CommonUIInputTypes.h"
 #include "ICommonInputModule.h"
@@ -77,5 +78,16 @@ UYCNOptionsDataRegistry* UYCNWidget_Options::GetOwningDataRegistry()
 
 void UYCNWidget_Options::OnOptionsTabSelected(FName TabID)
 {
+	//找到的已注册的源项
+	TArray<UYCNListDataObject_Base*>FoundListSourceItems = GetOwningDataRegistry()->GetListSourceItemBySelectedTabID(TabID);
+	
+	//将当前选择的主标签的子数据设置给List
+	CommonListView_OptionsList->SetListItems(FoundListSourceItems);
+	CommonListView_OptionsList->RequestRefresh();
 
+	if (CommonListView_OptionsList->GetNumItems() != 0)
+	{
+		CommonListView_OptionsList->NavigateToIndex(0);//让 ListView 导航/移动到第一个索引的条目。
+		CommonListView_OptionsList->SetSelectedIndex(0);//将第一项设置为选中状态
+	}
 }

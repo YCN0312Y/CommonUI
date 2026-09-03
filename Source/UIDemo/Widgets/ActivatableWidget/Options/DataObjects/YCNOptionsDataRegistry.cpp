@@ -2,6 +2,7 @@
 
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNOptionsDataRegistry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
 
 void UYCNOptionsDataRegistry::InitOptionsDataRegistry(ULocalPlayer* InOwningLocalPlayer)
 {
@@ -9,6 +10,20 @@ void UYCNOptionsDataRegistry::InitOptionsDataRegistry(ULocalPlayer* InOwningLoca
 	InitAudioCollectionTab();
 	InitVideoCollectionTab();
 	InitControlCollectionTab();
+}
+
+TArray<UYCNListDataObject_Base*> UYCNOptionsDataRegistry::GetListSourceItemBySelectedTabID(const FName& IsSelectedTabID)
+{
+	UYCNListDataObject_Collection* const* FoundTabCollectionPtr = RegistryOptionsTabList.FindByPredicate(
+		[IsSelectedTabID](UYCNListDataObject_Collection* AvailableTabCollection)
+		{
+			return AvailableTabCollection->GetDataID() == IsSelectedTabID;
+		});
+	if (!FoundTabCollectionPtr)return TArray<UYCNListDataObject_Base*>();
+
+	UYCNListDataObject_Collection* FoundTabCollection = *FoundTabCollectionPtr;
+
+	return FoundTabCollection->GetAllChildListData();
 }
 
 void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
@@ -20,6 +35,29 @@ void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
 		GameplayTab->SetDataDisplayName(FText::FromString(TEXT("游戏玩法")));
 
 		RegistryOptionsTabList.Add(GameplayTab);
+
+		//游戏难度标签
+		{
+			UYCNListDataObject_String* GameDifficulty = NewObject<UYCNListDataObject_String>();
+			if (GameDifficulty)
+			{
+				GameDifficulty->SetDataID(FName("GameDifficulty"));
+				GameDifficulty->SetDataDisplayName(FText::FromString(TEXT("游戏难度")));
+				//将 “游戏难度” 子标签添加给主标签 “游戏玩法”
+				GameplayTab->AddDataToChildDataList(GameDifficulty);
+			}
+		}
+		//测试标签
+		{
+			UYCNListDataObject_String* TestTab = NewObject<UYCNListDataObject_String>();
+			if (TestTab)
+			{
+				TestTab->SetDataID(FName("TestTab"));
+				TestTab->SetDataDisplayName(FText::FromString(TEXT("测试标签")));
+
+				GameplayTab->AddDataToChildDataList(TestTab);
+			}
+		}
 	}
 }
 
