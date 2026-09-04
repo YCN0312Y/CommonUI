@@ -83,7 +83,7 @@ void UYCNWidget_Options::OnOptionsTabSelected(FName TabID)
 	
 	//将当前选择的主标签的子数据设置给List
 	CommonListView_OptionsList->SetListItems(FoundListSourceItems);
-	CommonListView_OptionsList->RequestRefresh();
+	CommonListView_OptionsList->RequestRefresh();//刷新后有新的Row时就会调用 OnGenerateEntryWidgetInternal
 
 	if (CommonListView_OptionsList->GetNumItems() != 0)
 	{

@@ -6,7 +6,7 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Base.h"
 #include "YCNListDataObject_Value.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class UIDEMO_API UYCNListDataObject_Value : public UYCNListDataObject_Base
 {
 	GENERATED_BODY()

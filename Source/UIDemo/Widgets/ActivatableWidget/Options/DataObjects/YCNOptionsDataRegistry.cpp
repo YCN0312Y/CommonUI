@@ -17,12 +17,13 @@ TArray<UYCNListDataObject_Base*> UYCNOptionsDataRegistry::GetListSourceItemBySel
 	UYCNListDataObject_Collection* const* FoundTabCollectionPtr = RegistryOptionsTabList.FindByPredicate(
 		[IsSelectedTabID](UYCNListDataObject_Collection* AvailableTabCollection)
 		{
+			//遍历 RegistryOptionsTabList 如果遍历到的数据ID == 传进来的ID就返回这个数据
 			return AvailableTabCollection->GetDataID() == IsSelectedTabID;
 		});
 	if (!FoundTabCollectionPtr)return TArray<UYCNListDataObject_Base*>();
 
 	UYCNListDataObject_Collection* FoundTabCollection = *FoundTabCollectionPtr;
-
+	//返回遍历到正确ID的子数据列表
 	return FoundTabCollection->GetAllChildListData();
 }
 
@@ -43,6 +44,10 @@ void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
 			{
 				GameDifficulty->SetDataID(FName("GameDifficulty"));
 				GameDifficulty->SetDataDisplayName(FText::FromString(TEXT("游戏难度")));
+				GameDifficulty->AddDynamicOption(TEXT("Easy"), FText::FromString(TEXT("简单")));
+				GameDifficulty->AddDynamicOption(TEXT("Normal"), FText::FromString(TEXT("正常")));
+				GameDifficulty->AddDynamicOption(TEXT("Hard"), FText::FromString(TEXT("困难")));
+				GameDifficulty->AddDynamicOption(TEXT("Very Hard"), FText::FromString(TEXT("极难")));
 				//将 “游戏难度” 子标签添加给主标签 “游戏玩法”
 				GameplayTab->AddDataToChildDataList(GameDifficulty);
 			}

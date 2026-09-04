@@ -11,7 +11,7 @@ void Set##Value(const Type& InValue) { Value = InValue; }\
 FORCEINLINE Type Get##Value()const { return Value; }
 
 
-UCLASS()
+UCLASS(Abstract)
 class UIDEMO_API UYCNListDataObject_Base : public UObject
 {
 	GENERATED_BODY()
