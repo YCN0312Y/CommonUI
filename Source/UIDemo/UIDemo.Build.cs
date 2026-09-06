@@ -19,6 +19,7 @@ public class UIDemo : ModuleRules
 			"CommonInput",
             "Slate",
 			"SlateCore",
+            "PropertyPath"
 
         });
 

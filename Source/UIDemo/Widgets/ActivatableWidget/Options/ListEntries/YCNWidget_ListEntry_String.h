@@ -18,6 +18,7 @@ class UIDEMO_API UYCNWidget_ListEntry_String : public UYCNWidget_ListEntry_Base
 protected:
 	virtual void NativeOnInitialized()override;
 	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject)override;
+	virtual void OnOwningListDataObjectModified(UYCNListDataObject_Base* InOwningModifiedData, EOptionsListDataModifyReason InModifyReason)override;
 
 private:
 	//上一个

@@ -1,3 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Value.h"
+
+void UYCNListDataObject_Value::SetDataDynamicGetter(const TSharedPtr<FYCNOptionsDataInteractionHelper>& InDynamciGetter)
+{
+	DataDynamciGetter = InDynamciGetter;
+}
+
+void UYCNListDataObject_Value::SetDataDynamicSetter(const TSharedPtr<FYCNOptionsDataInteractionHelper>& InDynamciSetter)
+{
+	DataDynamciSetter = InDynamciSetter;
+}

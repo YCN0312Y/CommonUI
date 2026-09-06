@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "UIDemo/YCNEnumType.h"
 #include "YCNListDataObject_Base.generated.h"
 
 #define LIST_DATA_ACCESSOR(Type, Value)\
 void Set##Value(const Type& InValue) { Value = InValue; }\
 FORCEINLINE Type Get##Value()const { return Value; }
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnListDataModifiedDelegate, UYCNListDataObject_Base*, EOptionsListDataModifyReason);
 
 UCLASS(Abstract)
 class UIDEMO_API UYCNListDataObject_Base : public UObject
@@ -31,9 +33,15 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<UYCNListDataObject_Base>ParentData;
 
+public:
+	//列表数据修改时委托
+	FOnListDataModifiedDelegate OnListDataModified;
+
 protected:
 	//初始化数据对象
 	virtual void OnDataObjectInitialized();
+	//通知修改列表数据
+	virtual void NotifyListDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason = EOptionsListDataModifyReason::DirectlyModified);
 public:
 	//子类重写函数
 	virtual TArray<UYCNListDataObject_Base*>GetAllChildListData()const { return TArray<UYCNListDataObject_Base*>(); }

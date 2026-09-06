@@ -3,6 +3,11 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNOptionsDataRegistry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
+#include "UIDemo/Msic/YCNOptionsDataInteractionHelper.h"
+#include "UIDemo/Settings/YCNGameUserSettings.h"
+
+#define MAKE_OPTIONS_DATA_CONTROL(SetterOrGatterFuncName)\
+MakeShared<FYCNOptionsDataInteractionHelper>(GET_FUNCTION_NAME_STRING_CHECKED(UYCNGameUserSettings, SetterOrGatterFuncName))
 
 void UYCNOptionsDataRegistry::InitOptionsDataRegistry(ULocalPlayer* InOwningLocalPlayer)
 {
@@ -36,7 +41,6 @@ void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
 		GameplayTab->SetDataDisplayName(FText::FromString(TEXT("游戏玩法")));
 
 		RegistryOptionsTabList.Add(GameplayTab);
-
 		//游戏难度标签
 		{
 			UYCNListDataObject_String* GameDifficulty = NewObject<UYCNListDataObject_String>();
@@ -48,6 +52,8 @@ void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
 				GameDifficulty->AddDynamicOption(TEXT("Normal"), FText::FromString(TEXT("正常")));
 				GameDifficulty->AddDynamicOption(TEXT("Hard"), FText::FromString(TEXT("困难")));
 				GameDifficulty->AddDynamicOption(TEXT("Very Hard"), FText::FromString(TEXT("极难")));
+				GameDifficulty->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameDifficully));
+				GameDifficulty->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameDifficully));
 				//将 “游戏难度” 子标签添加给主标签 “游戏玩法”
 				GameplayTab->AddDataToChildDataList(GameDifficulty);
 			}

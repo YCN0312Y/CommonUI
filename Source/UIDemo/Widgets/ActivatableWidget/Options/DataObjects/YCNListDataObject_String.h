@@ -13,6 +13,7 @@ class UIDEMO_API UYCNListDataObject_String : public UYCNListDataObject_Value
 	GENERATED_BODY()
 
 protected:
+	//UYCNListDataObject_Base继承函数
 	virtual void OnDataObjectInitialized()override;
 	
 protected:

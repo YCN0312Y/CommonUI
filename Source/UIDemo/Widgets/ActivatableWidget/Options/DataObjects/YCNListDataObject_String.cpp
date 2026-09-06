@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
+#include "UIDemo/Msic/YCNOptionsDataInteractionHelper.h"
 
 void UYCNListDataObject_String::OnDataObjectInitialized()
 {
@@ -9,6 +10,14 @@ void UYCNListDataObject_String::OnDataObjectInitialized()
 		CurrentStringValue = AvailableOptionStringArray[0];
 	}
 
+	if (DataDynamciGetter)
+	{
+		if (!DataDynamciGetter->GetValudFromString().IsEmpty())
+		{
+			//如果 GameUserSetting 中保存的 CurrentGameDifficully 不为空，就设置给当前字符串
+			CurrentStringValue = DataDynamciGetter->GetValudFromString();
+		}
+	}
 	if (!TrySetDisplayTextFromStringValue(CurrentStringValue))
 	{
 		//如果查到的索引不在 AvailableOptionTextArray 中那就是无效索引
@@ -42,26 +51,44 @@ void UYCNListDataObject_String::AdvanceToNextOption()
 	}
 
 	TrySetDisplayTextFromStringValue(CurrentStringValue);
+
+	if (DataDynamciSetter)
+	{
+		//将 CurrentStringValue 的游戏难度设置缓存到 GameUserSettings 中
+		DataDynamciSetter->SetValudFromString(CurrentStringValue);
+		NotifyListDataModified(this);
+	}
+
 }
 
 void UYCNListDataObject_String::BackToLastOption()
 {
 	if (AvailableOptionStringArray.IsEmpty() || AvailableOptionTextArray.IsEmpty())return;
 
+	//当前显示的文本索引
 	const int32 CurrentDisplayIndex = AvailableOptionStringArray.IndexOfByKey(CurrentStringValue);
-	const int32 LastDisplayIndex = CurrentDisplayIndex - 1;
+	const int32 LastDisplayIndex = CurrentDisplayIndex - 1;//上一个文本索引
 
 	const bool bIsLastIndexValid = AvailableOptionStringArray.IsValidIndex(LastDisplayIndex);
 	if (bIsLastIndexValid)
 	{
+		//上一个文本索引有效，那么当前字符串值，就为字符串列表中上一个文本索引的字符
 		CurrentStringValue = AvailableOptionStringArray[LastDisplayIndex];
 	}
 	else
 	{
+		//上一个文本索引无效，就为字符串列表中最后文本索引的字符，设置给当前字符串值
 		CurrentStringValue = AvailableOptionStringArray.Last();
 	}
 
 	TrySetDisplayTextFromStringValue(CurrentStringValue);
+
+	if (DataDynamciSetter)
+	{
+		//将 CurrentStringValue 的游戏难度设置缓存到 GameUserSettings 中
+		DataDynamciSetter->SetValudFromString(CurrentStringValue);
+		NotifyListDataModified(this);
+	}
 }
 
 bool UYCNListDataObject_String::TrySetDisplayTextFromStringValue(const FString& InCurrentStringValue)

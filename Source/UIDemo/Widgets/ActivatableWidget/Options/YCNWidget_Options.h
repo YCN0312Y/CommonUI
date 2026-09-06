@@ -18,6 +18,7 @@ class UIDEMO_API UYCNWidget_Options : public UYCNWidget_ActivatableBase
 protected:
 	virtual void NativeOnInitialized()override;
 	virtual void NativeOnActivated()override;
+	virtual void NativeOnDeactivated()override;
 	
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -39,6 +40,13 @@ private:
 	void OnBackBoundActionTriggered();
 	//获取所属的数据注册表
 	UYCNOptionsDataRegistry* GetOwningDataRegistry();
+
+	/***********回调函数***********/
+	//TabList_OptionsTabs
 	UFUNCTION()
 	void OnOptionsTabSelected(FName TabID);
+
+	//CommonListView_OptionsList
+	void OnOptionsListHovered(UObject* InHoveredItem, bool bWasHovered);
+	void OnOptionsListSelection(UObject* InSelectionItem);
 };

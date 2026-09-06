@@ -31,4 +31,19 @@ end
 --function M:Tick(MyGeometry, InDeltaTime)
 --end
 
+function M:TaggleButtonImageHighLight(ShouldHighLight)
+    local ButtonImage = self.CommonImage_ButtonImage
+    local DefaultButtonImageColor = self.DefaultButtonImageColor
+    local HighLightButtonImageColor = self.HighLightButtonImageColor
+
+    if ButtonImage and DefaultButtonImageColor and HighLightButtonImageColor then
+        if ShouldHighLight then
+            ButtonImage:SetColorAndOpacity(HighLightButtonImageColor)
+        else
+            ButtonImage:SetColorAndOpacity(DefaultButtonImageColor)
+        end
+        
+    end
+end
+
 return M

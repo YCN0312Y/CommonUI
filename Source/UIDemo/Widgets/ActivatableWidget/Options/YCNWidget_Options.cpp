@@ -3,8 +3,10 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/YCNWidget_Options.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNOptionsDataRegistry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/ListEntries/YCNWidget_ListEntry_Base.h"
 #include "UIDemo/Widgets/Components/YCNCommonListViewBase.h"
 #include "UIDemo/Widgets/Components/YCNTabListWidgetBase.h"
+#include "UIDemo/Settings/YCNGameUserSettings.h"
 #include "Input/CommonUIInputTypes.h"
 #include "ICommonInputModule.h"
 #include "UIDemo/YCNDebugHelper.h"
@@ -32,6 +34,11 @@ void UYCNWidget_Options::NativeOnInitialized()
 	{
 		TabList_OptionsTabs->OnTabSelected.AddDynamic(this, &UYCNWidget_Options::OnOptionsTabSelected);
 	}
+	if (CommonListView_OptionsList)
+	{
+		CommonListView_OptionsList->OnItemIsHoveredChanged().AddUObject(this, &UYCNWidget_Options::OnOptionsListHovered);
+		CommonListView_OptionsList->OnItemSelectionChanged().AddUObject(this, &UYCNWidget_Options::OnOptionsListSelection);
+	}
 }
 
 void UYCNWidget_Options::NativeOnActivated()
@@ -49,6 +56,13 @@ void UYCNWidget_Options::NativeOnActivated()
 			TabList_OptionsTabs->RequestRegisterTab(TabCollection->GetDataID(), TabCollection->GetDataDisplayName());
 		}
 	}
+}
+
+void UYCNWidget_Options::NativeOnDeactivated()
+{
+	Super::NativeOnDeactivated();
+
+	UYCNGameUserSettings::Get()->ApplySettings(true);
 }
 
 void UYCNWidget_Options::OnResetBoundActionTriggered()
@@ -90,4 +104,20 @@ void UYCNWidget_Options::OnOptionsTabSelected(FName TabID)
 		CommonListView_OptionsList->NavigateToIndex(0);//让 ListView 导航/移动到第一个索引的条目。
 		CommonListView_OptionsList->SetSelectedIndex(0);//将第一项设置为选中状态
 	}
+}
+
+void UYCNWidget_Options::OnOptionsListHovered(UObject* InHoveredItem, bool bWasHovered)
+{
+	if (!InHoveredItem || !CommonListView_OptionsList)return;
+
+	UYCNWidget_ListEntry_Base* HoveredEntry = CommonListView_OptionsList->GetEntryWidgetFromItem<UYCNWidget_ListEntry_Base>(InHoveredItem);
+	if (HoveredEntry)
+	{
+		HoveredEntry->NativeOnListEntryWidgetHovered(bWasHovered);
+	}
+}
+
+void UYCNWidget_Options::OnOptionsListSelection(UObject* InSelectionItem)
+{
+	if (!InSelectionItem)return;
 }
