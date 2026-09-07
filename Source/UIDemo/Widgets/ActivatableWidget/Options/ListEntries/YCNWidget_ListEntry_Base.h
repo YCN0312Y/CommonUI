@@ -19,6 +19,7 @@ class UIDEMO_API UYCNWidget_ListEntry_Base : public UCommonUserWidget, public IU
 protected:
 	//切换主标签的时候自动调用
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
+	//选择按钮回调函数
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	//当前条目被分配了一个列表数据对象
 	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject);

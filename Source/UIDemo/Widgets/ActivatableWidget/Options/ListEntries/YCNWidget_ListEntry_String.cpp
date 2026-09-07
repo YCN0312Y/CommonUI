@@ -19,6 +19,7 @@ void UYCNWidget_ListEntry_String::NativeOnInitialized()
 	}
 	if (CommonRotator_AvailableOptions)
 	{
+		//点击旋转器的时候就把当前这个子标题变成选择的子标题
 		CommonRotator_AvailableOptions->OnClicked().AddLambda(
 			[this]()
 			{
@@ -53,6 +54,7 @@ void UYCNWidget_ListEntry_String::OnClickedCommonButton_Last()
 	{
 		CachedOwningStringDataObject->BackToLastOption();
 	}
+	//点击 上一个 的时候就把当前这个子标题变成选择的子标题
 	SelectThisEntryWidget();
 }
 
@@ -62,6 +64,7 @@ void UYCNWidget_ListEntry_String::OnClickedCommonButton_Next()
 	{
 		CachedOwningStringDataObject->AdvanceToNextOption();
 	}
+	//点击 下一个 的时候就把当前这个子标题变成选择的子标题
 	SelectThisEntryWidget();
 }
 

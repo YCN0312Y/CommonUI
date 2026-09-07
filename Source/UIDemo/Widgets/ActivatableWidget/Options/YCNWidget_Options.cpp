@@ -110,6 +110,7 @@ void UYCNWidget_Options::OnOptionsListHovered(UObject* InHoveredItem, bool bWasH
 {
 	if (!InHoveredItem || !CommonListView_OptionsList)return;
 
+	//从当前列表数据中获取悬停的数据
 	UYCNWidget_ListEntry_Base* HoveredEntry = CommonListView_OptionsList->GetEntryWidgetFromItem<UYCNWidget_ListEntry_Base>(InHoveredItem);
 	if (HoveredEntry)
 	{

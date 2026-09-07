@@ -45,5 +45,6 @@ void UYCNWidget_ListEntry_Base::OnOwningListDataObjectModified(UYCNListDataObjec
 
 void UYCNWidget_ListEntry_Base::SelectThisEntryWidget()
 {
+	//获取当前这个子标题是哪个主标题的，再将这个子控件设置为选择状态
 	CastChecked<UListView>(GetOwningListView())->SetSelectedItem(GetListItem());
 }
