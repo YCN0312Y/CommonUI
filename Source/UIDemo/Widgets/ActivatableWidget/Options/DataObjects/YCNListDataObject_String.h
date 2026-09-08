@@ -15,6 +15,10 @@ class UIDEMO_API UYCNListDataObject_String : public UYCNListDataObject_Value
 protected:
 	//UYCNListDataObject_Base继承函数
 	virtual void OnDataObjectInitialized()override;
+	//可重置为默认值
+	virtual bool CanResetBackToDefaultVaule()const override;
+	//尝试重置为默认值
+	virtual bool TryResetBackToDefaultVaule()override;
 	
 protected:
 	//当前字符串值

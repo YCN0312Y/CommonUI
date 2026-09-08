@@ -9,12 +9,16 @@
 class UCommonTextBlock;
 class UCommonLazyImage;
 class UCommonRichTextBlock;
+class UYCNListDataObject_Base;
 
 UCLASS()
 class UIDEMO_API UYCNWidget_OptionsDetailsView : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void NativeOnInitialized()override;
+
 private:
 	//标题
 	UPROPERTY(meta = (BindWidget))
@@ -32,5 +36,10 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCommonRichTextBlock>CommonRichText_DisabledReason;
 
+public:
+	//更新详情页面信息
+	void UpdateDetailsViewInfo(UYCNListDataObject_Base* InDataObject, const FString& InEntryWidgetClassName = FString());
+	//清空详情页面信息
+	void ClearDetailsViewInfo();
 };
 

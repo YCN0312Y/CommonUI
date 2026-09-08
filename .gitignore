@@ -3,6 +3,7 @@ Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
+
 # 每用户编辑器设置，不应提交
 Config/DefaultEditorPerProjectUserSettings.ini
 *.pdb
@@ -42,3 +43,5 @@ desktop.ini
 *.tmp
 *.temp
 
+# Local reference project
+/GameAssets/Source/FrontendUIProjectSource/

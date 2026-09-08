@@ -4,8 +4,12 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNOptionsDataRegistry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/ListEntries/YCNWidget_ListEntry_Base.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/YCNWidget_OptionsDetailsView.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Base.h"
 #include "UIDemo/Widgets/Components/YCNCommonListViewBase.h"
+#include "UIDemo/Widgets/Components/YCNCommonButtonBase.h"
 #include "UIDemo/Widgets/Components/YCNTabListWidgetBase.h"
+#include "UIDemo/Subsystems/YCNWidgetSubsystem.h"
 #include "UIDemo/Settings/YCNGameUserSettings.h"
 #include "Input/CommonUIInputTypes.h"
 #include "ICommonInputModule.h"
@@ -36,8 +40,22 @@ void UYCNWidget_Options::NativeOnInitialized()
 	}
 	if (CommonListView_OptionsList)
 	{
+		CommonListView_OptionsList->OnEntryWidgetGenerated().AddUObject(this, &UYCNWidget_Options::OnOptionsEntryWidgetGenerated);
 		CommonListView_OptionsList->OnItemIsHoveredChanged().AddUObject(this, &UYCNWidget_Options::OnOptionsListHovered);
 		CommonListView_OptionsList->OnItemSelectionChanged().AddUObject(this, &UYCNWidget_Options::OnOptionsListSelection);
+	}
+}
+
+void UYCNWidget_Options::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	if (DetailsView_ListEntryInfo)
+	{
+		if (UYCNListDataObject_Base* SelectedItem = CommonListView_OptionsList->GetSelectedItem<UYCNListDataObject_Base>())
+		{
+			DetailsView_ListEntryInfo->UpdateDetailsViewInfo(SelectedItem, TryGetEntryWidgetClassName(SelectedItem));
+		}
 	}
 }
 
@@ -67,7 +85,45 @@ void UYCNWidget_Options::NativeOnDeactivated()
 
 void UYCNWidget_Options::OnResetBoundActionTriggered()
 {
-	Debug::Print(TEXT("重置"));
+	if (ResettableDataArray.IsEmpty()|| !TabList_OptionsTabs)return;
+
+	if (UYCNWidgetSubsystem::Get(this))
+	{
+		UCommonButtonBase* SelectedTabButton = TabList_OptionsTabs->GetTabButtonBaseByID(TabList_OptionsTabs->GetActiveTab());
+		if (!SelectedTabButton)return;
+		const FString SelectedTabButtonName = CastChecked<UYCNCommonButtonBase>(SelectedTabButton)->GetButtonDisplayText().ToString();
+		const FString Message = TEXT("确认要将") + SelectedTabButtonName + TEXT("的所有选项恢复默认吗？");
+
+		UYCNWidgetSubsystem::Get(this)->PushConfirmWindowToModalStackAynsc(
+			EConfirmWindowType::YesNo,
+			FText::FromString(TEXT("重置")),
+			FText::FromString(Message),
+			[this](EConfirmWindowButtonType InButtonType)
+			{
+				if (InButtonType != EConfirmWindowButtonType::Confirm)
+				{
+					return;
+				}
+				bIsResettingData = true;
+				bool bHasDataFailedToReset = false;
+				for (UYCNListDataObject_Base* DataToReset : ResettableDataArray)
+				{
+					if (!DataToReset)continue;
+
+					if (!DataToReset->TryResetBackToDefaultVaule())
+					{
+						bHasDataFailedToReset = true;
+					}
+				}
+
+				if (!bHasDataFailedToReset)
+				{
+					ResettableDataArray.Empty();
+					RemoveActionBinding(ResetActionHandle);
+				}
+				bIsResettingData = false;
+			});
+	}
 }
 
 void UYCNWidget_Options::OnBackBoundActionTriggered()
@@ -90,8 +146,34 @@ UYCNOptionsDataRegistry* UYCNWidget_Options::GetOwningDataRegistry()
 	return CreateOwningDataRegistry;
 }
 
+FString UYCNWidget_Options::TryGetEntryWidgetClassName(UObject* InOwningListItem)
+{
+	if (!InOwningListItem || !CommonListView_OptionsList)return FString();
+
+	UUserWidget* FoundEntryWidget = CommonListView_OptionsList->GetEntryWidgetFromItem(InOwningListItem);
+	if (FoundEntryWidget)
+	{
+		return FoundEntryWidget->GetClass()->GetName();
+	}
+
+	return TEXT("无效的控件");
+}
+
 void UYCNWidget_Options::OnOptionsTabSelected(FName TabID)
 {
+	if (!CommonListView_OptionsList || !DetailsView_ListEntryInfo)return;
+
+	// 在替换数据前清除旧选择和自定义高亮，不依赖条目回收事件。
+	CommonListView_OptionsList->ClearSelection();
+	for (UUserWidget* DisplayedEntry : CommonListView_OptionsList->GetDisplayedEntryWidgets())
+	{
+		if (UYCNWidget_ListEntry_Base* Entry = Cast<UYCNWidget_ListEntry_Base>(DisplayedEntry))
+		{
+			Entry->BP_OnListEntryWidgetHovered(false, false);
+			Entry->BP_OnListEntryWidgetSelectionChanged(false);
+		}
+	}
+	DetailsView_ListEntryInfo->ClearDetailsViewInfo();
 	//找到的已注册的源项
 	TArray<UYCNListDataObject_Base*>FoundListSourceItems = GetOwningDataRegistry()->GetListSourceItemBySelectedTabID(TabID);
 	
@@ -103,6 +185,83 @@ void UYCNWidget_Options::OnOptionsTabSelected(FName TabID)
 	{
 		CommonListView_OptionsList->NavigateToIndex(0);//让 ListView 导航/移动到第一个索引的条目。
 		CommonListView_OptionsList->SetSelectedIndex(0);//将第一项设置为选中状态
+	}
+
+	ResettableDataArray.Empty();
+	for (UYCNListDataObject_Base* FoundListSourceItem : FoundListSourceItems)
+	{
+		if (!FoundListSourceItem)continue;
+		
+		if (!FoundListSourceItem->OnListDataModified.IsBoundToObject(this))
+		{
+			FoundListSourceItem->OnListDataModified.AddLambda(
+				[this](UYCNListDataObject_Base* ModifiedData, EOptionsListDataModifyReason ModifyReason)
+				{
+					if (!ModifiedData || bIsResettingData)return;
+
+					if (ModifiedData->CanResetBackToDefaultVaule())
+					{
+						ResettableDataArray.AddUnique(ModifiedData);
+
+						if (!GetActionBindings().Contains(ResetActionHandle))
+						{
+							AddActionBinding(ResetActionHandle);
+						}
+					}
+					else
+					{
+						if(ResettableDataArray.Contains(ModifiedData))
+						{
+							ResettableDataArray.Remove(ModifiedData);
+						}
+					}
+
+					if (ResettableDataArray.IsEmpty())
+					{
+						RemoveActionBinding(ResetActionHandle);
+					}
+				});
+		}
+		
+		if (FoundListSourceItem->CanResetBackToDefaultVaule())
+		{
+			ResettableDataArray.Add(FoundListSourceItem);
+		}
+	}
+
+	if (ResettableDataArray.IsEmpty())
+	{
+		RemoveActionBinding(ResetActionHandle);
+	}
+	else
+	{
+		if (!GetActionBindings().Contains(ResetActionHandle))
+		{
+			AddActionBinding(ResetActionHandle);
+		}
+	}
+}
+
+void UYCNWidget_Options::OnOptionsEntryWidgetGenerated(UUserWidget& InGeneratedItem)
+{
+	if (!CommonListView_OptionsList || !DetailsView_ListEntryInfo)return;
+
+	//对每个生成或复用的条目同步实际选中状态，包括未选中的条目。
+	if (UYCNWidget_ListEntry_Base* Entry = Cast<UYCNWidget_ListEntry_Base>(&InGeneratedItem))
+	{
+		const bool bIsSelected = Entry->IsListItemSelected();
+		Entry->BP_OnListEntryWidgetHovered(false, bIsSelected);
+		Entry->BP_OnListEntryWidgetSelectionChanged(bIsSelected);
+	}
+
+	//获取当前选择的子控件的数据
+	UYCNListDataObject_Base* SelectedItem = CommonListView_OptionsList->GetSelectedItem<UYCNListDataObject_Base>();
+	if (!SelectedItem)return;
+	
+	//只在当前选中项对应的条目生成完成时更新详情
+	if (CommonListView_OptionsList->GetEntryWidgetFromItem(SelectedItem) == &InGeneratedItem)
+	{
+		DetailsView_ListEntryInfo->UpdateDetailsViewInfo(SelectedItem, InGeneratedItem.GetClass()->GetName());
 	}
 }
 
@@ -120,5 +279,12 @@ void UYCNWidget_Options::OnOptionsListHovered(UObject* InHoveredItem, bool bWasH
 
 void UYCNWidget_Options::OnOptionsListSelection(UObject* InSelectionItem)
 {
-	if (!InSelectionItem)return;
+	if (!InSelectionItem || !DetailsView_ListEntryInfo)return;
+
+	UYCNListDataObject_Base* SelectionEntry = Cast<UYCNListDataObject_Base>(InSelectionItem);
+	if (SelectionEntry)
+	{
+		DetailsView_ListEntryInfo->UpdateDetailsViewInfo(SelectionEntry, TryGetEntryWidgetClassName(SelectionEntry));
+	}
+	
 }

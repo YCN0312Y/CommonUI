@@ -35,4 +35,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "YCN Button")
 	void SetButtonText(const FText& InText);
 
+	FText GetButtonDisplayText()const;
 };

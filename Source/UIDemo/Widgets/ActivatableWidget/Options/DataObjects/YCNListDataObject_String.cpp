@@ -10,6 +10,11 @@ void UYCNListDataObject_String::OnDataObjectInitialized()
 		CurrentStringValue = AvailableOptionStringArray[0];
 	}
 
+	if (HasDefaultValue())
+	{
+		CurrentStringValue = GetDefaultStringValue();
+	}
+
 	if (DataDynamciGetter)
 	{
 		if (!DataDynamciGetter->GetValudFromString().IsEmpty())
@@ -23,6 +28,28 @@ void UYCNListDataObject_String::OnDataObjectInitialized()
 		//如果查到的索引不在 AvailableOptionTextArray 中那就是无效索引
 		CurrentTextValue = FText::FromString(TEXT("无效的选项"));
 	}
+}
+
+bool UYCNListDataObject_String::CanResetBackToDefaultVaule() const
+{
+	return HasDefaultValue() && CurrentStringValue != GetDefaultStringValue();
+}
+
+bool UYCNListDataObject_String::TryResetBackToDefaultVaule()
+{
+	if (CanResetBackToDefaultVaule())
+	{
+		CurrentStringValue = GetDefaultStringValue();
+
+		TrySetDisplayTextFromStringValue(CurrentStringValue);
+		if (DataDynamciSetter)
+		{
+			DataDynamciSetter->SetValudFromString(CurrentStringValue);
+			NotifyListDataModified(this, EOptionsListDataModifyReason::ResetToDefault);
+			return true;
+		}
+	}
+	return false;
 }
 
 void UYCNListDataObject_String::AddDynamicOption(const FString& InStringValue, const FText& InTextValue)

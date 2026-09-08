@@ -4,6 +4,8 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
 #include "UIDemo/Msic/YCNOptionsDataInteractionHelper.h"
+#include "UIDemo/FunctionLibrary/YCNFunctionLibrary.h"
+#include "UIDemo/GameplayTags/YCNGameplayTags.h"
 #include "UIDemo/Settings/YCNGameUserSettings.h"
 
 #define MAKE_OPTIONS_DATA_CONTROL(SetterOrGatterFuncName)\
@@ -48,10 +50,17 @@ void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
 			{
 				GameDifficulty->SetDataID(FName("GameDifficulty"));
 				GameDifficulty->SetDataDisplayName(FText::FromString(TEXT("游戏难度")));
+				const FString EasyString = TEXT("<HighLight>简单：</>敌人毫无威胁，资源十分充裕。你可以抛开战斗压力，专注欣赏剧情、探索世界，享受纯粹的惬意旅程。\n\n");
+				const FString NormalString = TEXT("<HighLight>正常：</>最平衡、最具代入感的设计。保留了适当的游玩乐趣与成就感，只要掌握基础玩法，任何人都能顺畅通关。\n\n");
+				const FString HardString = TEXT("<HighLight>困难：</>全面检验你的熟练度。敌人更聪明、攻防更出色，促使你深入挖掘连招、配装与战术配合，带来极高的回馈感。\n\n");
+				const FString VeryHardString = TEXT("<HighLight>极难：</>专为追求极限的硬核玩家打造。极致的严谨度与专注度要求，把游戏机制发挥到极致，通关后成就感直接拉满。\n\n");
+				const FString DifficultyString = EasyString + NormalString + HardString + VeryHardString;
+				GameDifficulty->SetDescriptionRichText(FText::FromString(DifficultyString));
 				GameDifficulty->AddDynamicOption(TEXT("Easy"), FText::FromString(TEXT("简单")));
 				GameDifficulty->AddDynamicOption(TEXT("Normal"), FText::FromString(TEXT("正常")));
 				GameDifficulty->AddDynamicOption(TEXT("Hard"), FText::FromString(TEXT("困难")));
 				GameDifficulty->AddDynamicOption(TEXT("Very Hard"), FText::FromString(TEXT("极难")));
+				GameDifficulty->SetDefaultStringValue(TEXT("Normal"));
 				GameDifficulty->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentGameDifficully));
 				GameDifficulty->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentGameDifficully));
 				//将 “游戏难度” 子标签添加给主标签 “游戏玩法”
@@ -65,7 +74,8 @@ void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
 			{
 				TestTab->SetDataID(FName("TestTab"));
 				TestTab->SetDataDisplayName(FText::FromString(TEXT("测试标签")));
-
+				TestTab->SetSoftDescriptionImage(UYCNFunctionLibrary::GetOptionsSoftImageByTag(YCNGameplayTags::YCN_Image_TestImage));
+				TestTab->SetDescriptionRichText(FText::FromString(TEXT("这只是一个测试标签")));
 				GameplayTab->AddDataToChildDataList(TestTab);
 			}
 		}

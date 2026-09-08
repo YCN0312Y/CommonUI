@@ -17,5 +17,7 @@ class UIDEMO_API UYCNDeveloperSettings : public UDeveloperSettings
 public:
 	UPROPERTY(Config, EditAnywhere, Category = "Widget Soft Reference", meta = (ForceInlineRow, Categories = "YCN.Widget"))
 	TMap<FGameplayTag, TSoftClassPtr<UYCNWidget_ActivatableBase>>WidgetMap;
-	
+
+	UPROPERTY(Config, EditAnywhere, Category = "Options Image Reference", meta = (ForceInlineRow, Categories = "YCN.Image"))
+	TMap<FGameplayTag, TSoftObjectPtr<UTexture2D>>OptionSoftImageMap;
 };

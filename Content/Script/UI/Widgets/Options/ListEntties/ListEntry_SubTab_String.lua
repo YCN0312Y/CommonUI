@@ -23,7 +23,10 @@ local M = UnLua.Class()
 
 --子标题选中时调用
 function M:BP_OnListEntryWidgetSelectionChanged(bIsSelected)
-    self:ToggleHighLightState(bIsSelected or self.bEntryHovered == true)
+    --条目控件会被列表池化复用，缓存的 bEntryHovered 可能是上一个标签页遗留的，
+    --这里以控件自身的真实悬停状态重新同步一次
+    self.bEntryHovered = self:IsHovered() == true
+    self:ToggleHighLightState(bIsSelected or self.bEntryHovered)
 end
 
 function M:BP_OnListEntryWidgetHovered(bWasHovered, bIsEntryWidgetStillSelected)

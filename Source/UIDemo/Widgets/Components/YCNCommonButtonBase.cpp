@@ -46,3 +46,12 @@ void UYCNCommonButtonBase::SetButtonText(const FText& InText)
 		CommonText_ButtonText->SetText(InText);
 	}
 }
+
+FText UYCNCommonButtonBase::GetButtonDisplayText() const
+{
+	if (CommonText_ButtonText)
+	{
+		return CommonText_ButtonText->GetText();
+	}
+	return FText();
+}

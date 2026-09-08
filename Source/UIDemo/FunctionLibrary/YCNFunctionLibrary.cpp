@@ -15,3 +15,16 @@ TSoftClassPtr<UYCNWidget_ActivatableBase> UYCNFunctionLibrary::GetSoftWidgetClas
 	}
 	return TSoftClassPtr<UYCNWidget_ActivatableBase>();
 }
+
+TSoftObjectPtr<UTexture2D> UYCNFunctionLibrary::GetOptionsSoftImageByTag(UPARAM(meta = (Categories = "YCN.Image")) FGameplayTag InImageTag)
+{
+	const UYCNDeveloperSettings* Setting = GetDefault<UYCNDeveloperSettings>();
+	if (Setting)
+	{
+		if (Setting->OptionSoftImageMap.Contains(InImageTag))
+		{
+			return Setting->OptionSoftImageMap.FindRef(InImageTag);
+		}
+	}
+	return TSoftObjectPtr<UTexture2D>();
+}

@@ -45,8 +45,19 @@ protected:
 public:
 	//子类重写函数
 	virtual TArray<UYCNListDataObject_Base*>GetAllChildListData()const { return TArray<UYCNListDataObject_Base*>(); }
+
+	//是否有值可以重置
+	virtual bool HasDefaultValue()const { return false; }
+
+	//可重置为默认值
+	virtual bool CanResetBackToDefaultVaule()const { return false; }
+
+	//尝试重置为默认值
+	virtual bool TryResetBackToDefaultVaule(){ return false; }
+
 	//是否有任意子列表数据
 	virtual bool HasAnyChildListData()const { return false; }
+
 	//初始化数据对象
 	void InitDataObject();
 
