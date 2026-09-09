@@ -19,7 +19,7 @@ void UYCNWidget_OptionsDetailsView::UpdateDetailsViewInfo(UYCNListDataObject_Bas
 
 	CommonText_Title->SetText(InDataObject->GetDataDisplayName());
 
-	if (InDataObject->GetSoftDescriptionImage().IsValid())
+	if (!InDataObject->GetSoftDescriptionImage().IsNull())
 	{
 		CommonImage_DescriptionImage->SetBrushFromLazyTexture(InDataObject->GetSoftDescriptionImage());
 		CommonImage_DescriptionImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

@@ -25,13 +25,15 @@ private:
 	void InitAudioCollectionTab();
 	void InitVideoCollectionTab();
 	void InitControlCollectionTab();
+	//递归查找子列表数据
+	void FindChildListDataRecursively(UYCNListDataObject_Base* InParentData, TArray<UYCNListDataObject_Base*>& OutFoundChaildListData)const;
 
 public:
 	//初始化选项注册的数据
 	void InitOptionsDataRegistry(ULocalPlayer* InOwningLocalPlayer);
 
 	//根据选定的标签 ID 获取列表源数据
-	TArray<UYCNListDataObject_Base*>GetListSourceItemBySelectedTabID(const FName& IsSelectedTabID);
+	TArray<UYCNListDataObject_Base*>GetListSourceItemBySelectedTabID(const FName& InSelectedTabID)const;
 
 	FORCEINLINE const TArray<UYCNListDataObject_Collection*>&GetRegistryOptionsTabList()const { return RegistryOptionsTabList; }
 };

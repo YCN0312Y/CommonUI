@@ -14,6 +14,7 @@ class UIDEMO_API UYCNCommonListViewBase : public UCommonListView
 	GENERATED_BODY()
 
 protected:
+	virtual bool OnIsSelectableOrNavigableInternal(UObject* FirstSelectedItem)override;
 	//内部生成条目控件时
 	virtual UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable) override;
 #if WITH_EDITOR	

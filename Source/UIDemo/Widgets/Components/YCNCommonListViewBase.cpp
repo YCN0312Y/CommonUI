@@ -4,7 +4,13 @@
 #include "UIDemo/DataAssets/YCNDataAsset_DataListEntry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/ListEntries/YCNWidget_ListEntry_Base.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Base.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
 #include "Editor/WidgetCompilerLog.h"
+
+bool UYCNCommonListViewBase::OnIsSelectableOrNavigableInternal(UObject* FirstSelectedItem)
+{
+	return !FirstSelectedItem->IsA<UYCNListDataObject_Collection>();
+}
 
 UUserWidget& UYCNCommonListViewBase::OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable)
 {

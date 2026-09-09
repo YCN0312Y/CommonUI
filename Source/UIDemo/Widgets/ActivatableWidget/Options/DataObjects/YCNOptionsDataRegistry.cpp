@@ -3,6 +3,7 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNOptionsDataRegistry.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Scalar.h"
 #include "UIDemo/Msic/YCNOptionsDataInteractionHelper.h"
 #include "UIDemo/FunctionLibrary/YCNFunctionLibrary.h"
 #include "UIDemo/GameplayTags/YCNGameplayTags.h"
@@ -19,19 +20,35 @@ void UYCNOptionsDataRegistry::InitOptionsDataRegistry(ULocalPlayer* InOwningLoca
 	InitControlCollectionTab();
 }
 
-TArray<UYCNListDataObject_Base*> UYCNOptionsDataRegistry::GetListSourceItemBySelectedTabID(const FName& IsSelectedTabID)
+TArray<UYCNListDataObject_Base*> UYCNOptionsDataRegistry::GetListSourceItemBySelectedTabID(const FName& InSelectedTabID)const
 {
 	UYCNListDataObject_Collection* const* FoundTabCollectionPtr = RegistryOptionsTabList.FindByPredicate(
-		[IsSelectedTabID](UYCNListDataObject_Collection* AvailableTabCollection)
+		[InSelectedTabID](UYCNListDataObject_Collection* AvailableTabCollection)
 		{
 			//遍历 RegistryOptionsTabList 如果遍历到的数据ID == 传进来的ID就返回这个数据
-			return AvailableTabCollection->GetDataID() == IsSelectedTabID;
+			return AvailableTabCollection->GetDataID() == InSelectedTabID;
 		});
 	if (!FoundTabCollectionPtr)return TArray<UYCNListDataObject_Base*>();
 
+	//主标题
 	UYCNListDataObject_Collection* FoundTabCollection = *FoundTabCollectionPtr;
-	//返回遍历到正确ID的子数据列表
-	return FoundTabCollection->GetAllChildListData();
+	
+	TArray<UYCNListDataObject_Base*>AllChildListItem;
+
+	for (UYCNListDataObject_Base* ChildListData : FoundTabCollection->GetAllChildListData())
+	{
+		//遍历主标签的子数据列表
+		if (!ChildListData)continue;	
+		//再将遍历到的子数据列表添加到 AllChildListItem中
+		AllChildListItem.Add(ChildListData);
+		
+		if (ChildListData->HasAnyChildListData())
+		{
+			//如果 ChildListData 也有子数据就将 ChildListData 的子数据添加到 AllChildListItem中
+			FindChildListDataRecursively(ChildListData, AllChildListItem);
+		}
+	}
+	return AllChildListItem;
 }
 
 void UYCNOptionsDataRegistry::InitGameplayCollectionTab()
@@ -90,6 +107,30 @@ void UYCNOptionsDataRegistry::InitAudioCollectionTab()
 		AudioTab->SetDataID(FName("Audio"));
 		AudioTab->SetDataDisplayName(FText::FromString(TEXT("音频")));
 
+		//音量
+		{
+			UYCNListDataObject_Collection* VolumeCategory = NewObject<UYCNListDataObject_Collection>();
+			VolumeCategory->SetDataID(FName("VolumeCategory"));
+			VolumeCategory->SetDataDisplayName(FText::FromString(TEXT("音量")));
+
+			AudioTab->AddDataToChildDataList(VolumeCategory);
+
+			//游戏主音量
+			{
+				UYCNListDataObject_Scalar* MainVolume = NewObject<UYCNListDataObject_Scalar>();
+				MainVolume->SetDataID(FName("MainVolume"));
+				MainVolume->SetDataDisplayName(FText::FromString(TEXT("游戏主音量")));
+				MainVolume->SetDescriptionRichText(FText::FromString(TEXT("调节游戏内所有声音的总音量。")));
+				MainVolume->SetDisplayValueRange(TRange<float>(0.f, 1.f));
+				MainVolume->SetOutputValueRange(TRange<float>(0.f, 2.f));
+				MainVolume->SetSliderStepSize(0.01f);
+				MainVolume->SetDisplayNumericType(ECommonNumericType::Percentage);
+				MainVolume->SetNumberFormattingOptions(UYCNListDataObject_Scalar::NoDecimal());
+				MainVolume->SetDefaultStringValue(LexToString(1.f));
+				VolumeCategory->AddDataToChildDataList(MainVolume);
+			}
+		}
+
 		RegistryOptionsTabList.Add(AudioTab);
 	}
 }
@@ -115,5 +156,22 @@ void UYCNOptionsDataRegistry::InitControlCollectionTab()
 		ControlTab->SetDataDisplayName(FText::FromString(TEXT("控制")));
 
 		RegistryOptionsTabList.Add(ControlTab);
+	}
+}
+
+void UYCNOptionsDataRegistry::FindChildListDataRecursively(UYCNListDataObject_Base* InParentData, TArray<UYCNListDataObject_Base*>& OutFoundChaildListData)const
+{
+	if (!InParentData || !InParentData->HasAnyChildListData())return;
+
+	for (UYCNListDataObject_Base* SubChildListData : InParentData->GetAllChildListData())
+	{
+		if (!SubChildListData)continue;
+
+		OutFoundChaildListData.Add(SubChildListData);
+
+		if (SubChildListData->HasAnyChildListData())
+		{
+			FindChildListDataRecursively(SubChildListData, OutFoundChaildListData);
+		}
 	}
 }
