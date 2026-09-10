@@ -126,8 +126,24 @@ void UYCNOptionsDataRegistry::InitAudioCollectionTab()
 				MainVolume->SetSliderStepSize(0.01f);
 				MainVolume->SetDisplayNumericType(ECommonNumericType::Percentage);
 				MainVolume->SetNumberFormattingOptions(UYCNListDataObject_Scalar::NoDecimal());
-				MainVolume->SetDefaultStringValue(LexToString(1.f));
+				MainVolume->SetDefaultStringValue(LexToString(2.f));
+				MainVolume->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCachedMainVolume));
+				MainVolume->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCachedMainVolume));
+
 				VolumeCategory->AddDataToChildDataList(MainVolume);
+			}
+
+			//测试标签
+			{
+				UYCNListDataObject_String* TestTab = NewObject<UYCNListDataObject_String>();
+				if (TestTab)
+				{
+					TestTab->SetDataID(FName("TestTab"));
+					TestTab->SetDataDisplayName(FText::FromString(TEXT("测试标签")));
+					TestTab->SetSoftDescriptionImage(UYCNFunctionLibrary::GetOptionsSoftImageByTag(YCNGameplayTags::YCN_Image_TestImage));
+					TestTab->SetDescriptionRichText(FText::FromString(TEXT("这只是一个测试标签")));
+					VolumeCategory->AddDataToChildDataList(TestTab);
+				}
 			}
 		}
 

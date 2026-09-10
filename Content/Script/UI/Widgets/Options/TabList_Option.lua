@@ -19,7 +19,6 @@ function M:PreConstruct(IsDesignTime)
         if self.CommonActionWidget_LastTab and self.CommonActionWidget_NextTab then
             self.CommonActionWidget_LastTab:SetInputAction(self.PreviousTabInputActionData)
             self.CommonActionWidget_NextTab:SetInputAction(self.NextTabInputActionData)
-            print("aaaaaaaa")
         end
     end
 end

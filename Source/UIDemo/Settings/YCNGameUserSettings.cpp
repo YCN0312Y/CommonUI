@@ -2,6 +2,12 @@
 
 #include "UIDemo/Settings/YCNGameUserSettings.h"
 
+UYCNGameUserSettings::UYCNGameUserSettings()
+	:CachedMainVolume(2.f)
+{
+
+}
+
 UYCNGameUserSettings* UYCNGameUserSettings::Get()
 {
 	if (GEngine)

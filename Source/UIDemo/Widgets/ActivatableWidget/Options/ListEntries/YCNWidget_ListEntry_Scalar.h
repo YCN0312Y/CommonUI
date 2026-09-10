@@ -8,6 +8,7 @@
 
 class UCommonNumericTextBlock;
 class UAnalogSlider;
+class UYCNListDataObject_Scalar;
 
 UCLASS()
 class UIDEMO_API UYCNWidget_ListEntry_Scalar : public UYCNWidget_ListEntry_Base
@@ -24,6 +25,17 @@ protected:
 private:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UCommonNumericTextBlock>CommonNumeric_SettingValue;
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UAnalogSlider>AnalogSlider_SettingSlider;
+
+	//缓存拥有的标量数据对象
+	UPROPERTY(Transient)
+	TObjectPtr<UYCNListDataObject_Scalar>CachedOwningScalarDataObject;
+
+private:
+	UFUNCTION()
+	void OnSettingSliderValueChanged(float NewValue);
+	UFUNCTION()
+	void OnSettingSliderMouseCaptureBegin();
 };

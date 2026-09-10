@@ -13,18 +13,28 @@ class UIDEMO_API UYCNGameUserSettings : public UGameUserSettings
 	GENERATED_BODY()
 	
 public:
+	UYCNGameUserSettings();
+
 	static UYCNGameUserSettings* Get();
 
 private:
-	//当前游戏难度
+	//缓存游戏难度
 	UPROPERTY(Config)
 	FString CurrentGameDifficully;
-
+	//缓存的主音量
+	UPROPERTY(Config)
+	float CachedMainVolume;
 public:
-	//设置当前游戏难度
+	//设置缓存游戏难度
 	UFUNCTION()
 	void SetCurrentGameDifficully(const FString& NewDifficullyValue) { CurrentGameDifficully = NewDifficullyValue; }
-	//获取当前游戏难度
+	//获取缓存游戏难度
 	UFUNCTION()
 	FString GetCurrentGameDifficully()const { return CurrentGameDifficully; }
+	//设置缓存的主音量
+	UFUNCTION()
+	void SetCachedMainVolume(const float& NewVolumeValue) { CachedMainVolume = NewVolumeValue; }
+	//获取缓存的主音量
+	UFUNCTION()
+	float GetCachedMainVolume()const { return CachedMainVolume; }
 };
