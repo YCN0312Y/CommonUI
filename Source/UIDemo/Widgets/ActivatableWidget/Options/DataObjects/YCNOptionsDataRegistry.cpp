@@ -119,7 +119,7 @@ void UYCNOptionsDataRegistry::InitAudioCollectionTab()
 			{
 				UYCNListDataObject_Scalar* MainVolume = NewObject<UYCNListDataObject_Scalar>();
 				MainVolume->SetDataID(FName("MainVolume"));
-				MainVolume->SetDataDisplayName(FText::FromString(TEXT("游戏主音量")));
+				MainVolume->SetDataDisplayName(FText::FromString(TEXT("主音量")));
 				MainVolume->SetDescriptionRichText(FText::FromString(TEXT("调节游戏内所有声音的总音量。")));
 				MainVolume->SetDisplayValueRange(TRange<float>(0.f, 1.f));
 				MainVolume->SetOutputValueRange(TRange<float>(0.f, 2.f));
@@ -133,20 +133,77 @@ void UYCNOptionsDataRegistry::InitAudioCollectionTab()
 				VolumeCategory->AddDataToChildDataList(MainVolume);
 			}
 
-			//测试标签
+			//音乐音量
 			{
-				UYCNListDataObject_String* TestTab = NewObject<UYCNListDataObject_String>();
-				if (TestTab)
-				{
-					TestTab->SetDataID(FName("TestTab"));
-					TestTab->SetDataDisplayName(FText::FromString(TEXT("测试标签")));
-					TestTab->SetSoftDescriptionImage(UYCNFunctionLibrary::GetOptionsSoftImageByTag(YCNGameplayTags::YCN_Image_TestImage));
-					TestTab->SetDescriptionRichText(FText::FromString(TEXT("这只是一个测试标签")));
-					VolumeCategory->AddDataToChildDataList(TestTab);
-				}
+				UYCNListDataObject_Scalar* MusicVolume = NewObject<UYCNListDataObject_Scalar>();
+				MusicVolume->SetDataID(FName("MusicVolume"));
+				MusicVolume->SetDataDisplayName(FText::FromString(TEXT("背景音乐")));
+				MusicVolume->SetDescriptionRichText(FText::FromString(TEXT("调节游戏内背景音乐与配乐的音量。")));
+				MusicVolume->SetDisplayValueRange(TRange<float>(0.f, 1.f));
+				MusicVolume->SetOutputValueRange(TRange<float>(0.f, 2.f));
+				MusicVolume->SetSliderStepSize(0.01f);
+				MusicVolume->SetDisplayNumericType(ECommonNumericType::Percentage);
+				MusicVolume->SetNumberFormattingOptions(UYCNListDataObject_Scalar::NoDecimal());
+				MusicVolume->SetDefaultStringValue(LexToString(2.f));
+				MusicVolume->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCachedMusicVolume));
+				MusicVolume->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCachedMusicVolume));
+
+				VolumeCategory->AddDataToChildDataList(MusicVolume);
 			}
+
+			//音效音量
+			{
+				UYCNListDataObject_Scalar* SoundVolume = NewObject<UYCNListDataObject_Scalar>();
+				SoundVolume->SetDataID(FName("SoundVolume"));
+				SoundVolume->SetDataDisplayName(FText::FromString(TEXT("音效")));
+				SoundVolume->SetDescriptionRichText(FText::FromString(TEXT("调节武器、战斗、环境互动与界面点击等音效的音量。")));
+				SoundVolume->SetDisplayValueRange(TRange<float>(0.f, 1.f));
+				SoundVolume->SetOutputValueRange(TRange<float>(0.f, 2.f));
+				SoundVolume->SetSliderStepSize(0.01f);
+				SoundVolume->SetDisplayNumericType(ECommonNumericType::Percentage);
+				SoundVolume->SetNumberFormattingOptions(UYCNListDataObject_Scalar::NoDecimal());
+				SoundVolume->SetDefaultStringValue(LexToString(2.f));
+				SoundVolume->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCachedSoundVolume));
+				SoundVolume->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCachedSoundVolume));
+
+				VolumeCategory->AddDataToChildDataList(SoundVolume);
+			}
+
 		}
 
+		//音效分类
+		{
+			UYCNListDataObject_Collection* SoundCategory = NewObject<UYCNListDataObject_Collection>();
+			SoundCategory->SetDataID(FName("SoundCategory"));
+			SoundCategory->SetDataDisplayName(FText::FromString(TEXT("音效")));
+
+			AudioTab->AddDataToChildDataList(SoundCategory);
+
+			//背景音效
+			{
+				UYCNListDataObject_StringBool* BackgroundAudio = NewObject<UYCNListDataObject_StringBool>();
+				BackgroundAudio->SetDataID(FName("BackgroundAudio"));
+				BackgroundAudio->SetDataDisplayName(FText::FromString(TEXT("背景音效")));
+				BackgroundAudio->SetDescriptionRichText(FText::FromString(TEXT("控制是否播放场景与环境背景音。")));
+				BackgroundAudio->SetFlaseDefaultValue();
+				BackgroundAudio->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCachedBackgroundAudio));
+				BackgroundAudio->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCachedBackgroundAudio));
+
+				SoundCategory->AddDataToChildDataList(BackgroundAudio);
+			}
+			//HDR
+			{
+				UYCNListDataObject_StringBool* UseHDRAudioMode = NewObject<UYCNListDataObject_StringBool>();
+				UseHDRAudioMode->SetDataID(FName("UseHDRAudioMode"));
+				UseHDRAudioMode->SetDataDisplayName(FText::FromString(TEXT("HDR")));
+				UseHDRAudioMode->SetDescriptionRichText(FText::FromString(TEXT("开启高动态范围渲染，呈现更深邃的暗部与更明亮的细节（需显示设备支持）。")));
+				UseHDRAudioMode->SetFlaseDefaultValue();
+				UseHDRAudioMode->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCachedUseHDRAudioMode));
+				UseHDRAudioMode->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCachedUseHDRAudioMode));
+
+				SoundCategory->AddDataToChildDataList(UseHDRAudioMode);
+			}
+		}
 		RegistryOptionsTabList.Add(AudioTab);
 	}
 }

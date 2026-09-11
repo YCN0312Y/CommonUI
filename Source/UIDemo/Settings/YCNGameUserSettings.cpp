@@ -4,6 +4,10 @@
 
 UYCNGameUserSettings::UYCNGameUserSettings()
 	:CachedMainVolume(2.f)
+	,CachedMusicVolume(2.f)
+	,CachedSoundVolume(2.f)
+	,CachedBackgroundAudio(false)
+	, CachedUseHDRAudioMode(false)
 {
 
 }

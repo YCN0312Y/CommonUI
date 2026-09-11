@@ -13,7 +13,7 @@ void UYCNWidget_ListEntry_Base::NativeOnListItemObjectSet(UObject* ListItemObjec
 	//然后把每条数据的显示名称设置成这个数据的显示名称
 	OnOwningListDataObjectSet(CastChecked<UYCNListDataObject_Base>(ListItemObject));
 }
-
+	
 void UYCNWidget_ListEntry_Base::NativeOnItemSelectionChanged(bool bIsSelected)
 {
 	IUserObjectListEntry::NativeOnItemSelectionChanged(bIsSelected);

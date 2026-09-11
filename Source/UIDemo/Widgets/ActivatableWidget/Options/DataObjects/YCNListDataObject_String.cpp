@@ -132,3 +132,49 @@ bool UYCNListDataObject_String::TrySetDisplayTextFromStringValue(const FString& 
 	}
 	return false;
 }
+
+/************************************UYCNListDataObject_StringBool************************************/
+void UYCNListDataObject_StringBool::OnDataObjectInitialized()
+{
+	TryInitBoolValue();
+
+	Super::OnDataObjectInitialized();
+}
+
+void UYCNListDataObject_StringBool::TryInitBoolValue()
+{
+	if (!AvailableOptionStringArray.Contains(TrueString))
+	{
+		AddDynamicOption(TrueString, FText::FromString(TEXT("开启")));
+	}
+	if (!AvailableOptionStringArray.Contains(FalseString))
+	{
+		AddDynamicOption(FalseString, FText::FromString(TEXT("关闭")));
+	}
+}
+
+void UYCNListDataObject_StringBool::OverrideTrueDisplayText(const FText& InNewTrueDisplayText)
+{
+	if (!AvailableOptionStringArray.Contains(TrueString))
+	{
+		AddDynamicOption(TrueString, InNewTrueDisplayText);
+	}
+}
+
+void UYCNListDataObject_StringBool::OverrideFalseDisplayText(const FText& InNewFalseDisplayText)
+{
+	if (!AvailableOptionStringArray.Contains(FalseString))
+	{
+		AddDynamicOption(FalseString, InNewFalseDisplayText);
+	}
+}
+
+void UYCNListDataObject_StringBool::SetTrueDefaultValue()
+{
+	SetDefaultStringValue(TrueString);
+}
+
+void UYCNListDataObject_StringBool::SetFlaseDefaultValue()
+{
+	SetDefaultStringValue(FalseString);
+}

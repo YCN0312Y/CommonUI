@@ -6,7 +6,6 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Value.h"
 #include "YCNListDataObject_String.generated.h"
 
-
 UCLASS()
 class UIDEMO_API UYCNListDataObject_String : public UYCNListDataObject_Value
 {
@@ -43,4 +42,26 @@ public:
 	FORCEINLINE FText GetCurrentTextValue()const { return CurrentTextValue; }
 	FORCEINLINE const TArray<FString>& GetAvailableOptionStringArray()const { return AvailableOptionStringArray; }
 	FORCEINLINE const TArray<FText>& GetAvailableOptionTextArray()const { return AvailableOptionTextArray; }
+};
+
+UCLASS()
+class UIDEMO_API UYCNListDataObject_StringBool : public UYCNListDataObject_String
+{
+	GENERATED_BODY()
+
+protected:
+	//UYCNListDataObject_Base继承函数
+	virtual void OnDataObjectInitialized()override;
+private:
+	const FString TrueString = TEXT("true");
+	const FString FalseString = TEXT("false");
+
+private:
+	void TryInitBoolValue();
+
+public:
+	void OverrideTrueDisplayText(const FText& InNewTrueDisplayText);
+	void OverrideFalseDisplayText(const FText& InNewFalseDisplayText);
+	void SetTrueDefaultValue();
+	void SetFlaseDefaultValue();
 };

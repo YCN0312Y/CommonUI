@@ -15,7 +15,7 @@ float UYCNListDataObject_Scalar::StringToFloat(const FString NewValue)const
 FCommonNumberFormattingOptions UYCNListDataObject_Scalar::NoDecimal()
 {
 	FCommonNumberFormattingOptions Options;
-	Options.MaximumFractionalDigits = 0;
+	Options.MaximumFractionalDigits = 0;//保留0位小数点
 	return Options;
 }
 
@@ -30,8 +30,12 @@ void UYCNListDataObject_Scalar::SetCurrentValue(float InNewValue)
 {
 	if(DataDynamciSetter)
 	{
+		/*
+		* InNewValue 根据根据 DisplayValueRange 的区间映射到 OutputValueRange 的区间中
+		* 如果InNewValue = 0.1 在(0,1)中为0.1，在(0,2)中为0.2
+		*/
 		const float ClampedValue = FMath::GetMappedRangeValueClamped(DisplayValueRange, OutputValueRange, InNewValue);
-		DataDynamciSetter->SetValudFromString(LexToString(ClampedValue));
+		DataDynamciSetter->SetValudFromString(LexToString(ClampedValue));//将值保存到用户设置中
 
 		NotifyListDataModified(this);
 	}
@@ -41,7 +45,7 @@ float UYCNListDataObject_Scalar::GetCurrentValue()const
 {
 	if (DataDynamciGetter)
 	{
-		//获取映射范围内的夹紧值
+		//获取用户设置中的值
 		return FMath::GetMappedRangeValueClamped(OutputValueRange, DisplayValueRange, StringToFloat(DataDynamciGetter->GetValudFromString()));
 	}
 	return 0.0f;

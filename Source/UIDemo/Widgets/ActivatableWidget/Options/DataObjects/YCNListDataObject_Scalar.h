@@ -25,9 +25,9 @@ private:
 	TRange<float>OutputValueRange = TRange<float>(0.f, 1.f);
 	//滑块步长
 	float SliderStepSize = 0.1f;
-	//显示的数字类型
+	//数字类型
 	ECommonNumericType DisplayNumericType = ECommonNumericType::Number;
-	//数字格式化选项
+	//数字格式选项
 	FCommonNumberFormattingOptions NumberFormattingOptions;
 
 private:
@@ -40,7 +40,9 @@ public:
 	LIST_DATA_ACCESSOR(ECommonNumericType, DisplayNumericType);
 	LIST_DATA_ACCESSOR(FCommonNumberFormattingOptions, NumberFormattingOptions);
 
+	//无小数
 	static FCommonNumberFormattingOptions NoDecimal();
+	//带小数点
 	static FCommonNumberFormattingOptions WithDecimal(int32 NumFracDigit);
 
 	float GetCurrentValue()const;

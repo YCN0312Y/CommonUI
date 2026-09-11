@@ -21,20 +21,27 @@ void UYCNWidget_ListEntry_Scalar::OnOwningListDataObjectSet(UYCNListDataObject_B
 {
 	Super::OnOwningListDataObjectSet(InOwningListDataObject);
 
+	//将传进来的数据转换为标量数据
 	CachedOwningScalarDataObject = Cast<UYCNListDataObject_Scalar>(InOwningListDataObject);
 	if (CachedOwningScalarDataObject)
 	{
 		if (!CommonNumeric_SettingValue || !AnalogSlider_SettingSlider)return;
 
+		//设置数字类型
 		CommonNumeric_SettingValue->SetNumericType(CachedOwningScalarDataObject->GetDisplayNumericType());
+		//设置数字显示格式
 		CommonNumeric_SettingValue->FormattingSpecification = CachedOwningScalarDataObject->GetNumberFormattingOptions();
+		//设置当前值
 		CommonNumeric_SettingValue->SetCurrentValue(CachedOwningScalarDataObject->GetCurrentValue());
 		
+		//设置最小值
 		AnalogSlider_SettingSlider->SetMinValue(CachedOwningScalarDataObject->GetDisplayValueRange().GetLowerBoundValue());
+		//设置最大值
 		AnalogSlider_SettingSlider->SetMaxValue(CachedOwningScalarDataObject->GetDisplayValueRange().GetUpperBoundValue());
+		//设置使用（按键/手柄）调整值的时候一次调整多少
 		AnalogSlider_SettingSlider->SetStepSize(CachedOwningScalarDataObject->GetSliderStepSize());
+		//设置滑块当前值
 		AnalogSlider_SettingSlider->SetValue(CachedOwningScalarDataObject->GetCurrentValue());
-
 	}
 }
 
