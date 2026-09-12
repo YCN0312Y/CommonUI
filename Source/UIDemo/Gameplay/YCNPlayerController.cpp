@@ -3,6 +3,7 @@
 #include "UIDemo/Gameplay/YCNPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraActor.h"
+#include "UIDemo/Settings/YCNGameUserSettings.h"
 
 void AYCNPlayerController::OnPossess(APawn* PawnToPossess)
 {
@@ -15,5 +16,14 @@ void AYCNPlayerController::OnPossess(APawn* PawnToPossess)
 	{
 		//将根据标签获取来的摄像机设置给视图目标
 		SetViewTarget(AllCamera[0]);
+	}
+
+	UYCNGameUserSettings* GameUserSettings = UYCNGameUserSettings::Get();
+	if (!GameUserSettings)return;
+
+	if (GameUserSettings->GetLastCPUBenchmarkResult() == -1.f || GameUserSettings->GetLastGPUBenchmarkResult() == -1.f)
+	{
+		GameUserSettings->RunHardwareBenchmark();
+		GameUserSettings->ApplyHardwareBenchmarkResults();
 	}
 }

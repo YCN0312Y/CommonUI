@@ -46,3 +46,7 @@
 
 9月12日<br>
 （06-21）**V1.3**完善了“音频”页面，新加了“UYCNListDataObject_StringBool”数据对象，主要用于功能的“开启/关闭”。
+
+9月13日<br>
+（07-08）创建了“视频”选项的“窗口模式”选项，创建了“UYCNListDataObject_Resolution”类.
+

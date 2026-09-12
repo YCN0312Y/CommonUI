@@ -65,3 +65,41 @@ public:
 	void SetTrueDefaultValue();
 	void SetFlaseDefaultValue();
 };
+
+UCLASS()
+class UIDEMO_API UYCNListDataObject_StringEnum : public UYCNListDataObject_String
+{
+	GENERATED_BODY()
+
+public:
+	//添加枚举选项
+	template<typename EnumType>
+	void AddEnumOption(EnumType InEnumOption, const FText& InDisplayText)
+	{
+		const UEnum* StaticEnumOption = StaticEnum<EnumType>();
+		if (StaticEnumOption)
+		{
+			const FString ConveretedEnumString = StaticEnumOption->GetNameStringByValue(InEnumOption);
+
+			AddDynamicOption(ConveretedEnumString, InDisplayText);
+		}
+	}
+
+	template<typename EnumType>
+	void SetDefaultValueFromEnumOption(EnumType InEnumOption)
+	{
+		const UEnum* StaticEnumOption = StaticEnum<EnumType>();
+		if (StaticEnumOption)
+		{
+			const FString ConveretedEnumString = StaticEnumOption->GetNameStringByValue(InEnumOption);
+			SetDefaultStringValue(ConveretedEnumString);
+		}
+	}
+
+	template<typename EnumType>
+	EnumType GetCurrentEnum()const
+	{
+		const UEnum* StaticEnumOption = StaticEnum<EnumType>();
+		return (EnumType)StaticEnumOption->GetValueByNameString(CurrentStringValue);
+	}
+};

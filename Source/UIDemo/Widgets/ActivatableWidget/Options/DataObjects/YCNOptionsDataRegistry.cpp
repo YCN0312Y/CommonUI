@@ -4,6 +4,7 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Collection.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Scalar.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Resolution.h"
 #include "UIDemo/Msic/YCNOptionsDataInteractionHelper.h"
 #include "UIDemo/FunctionLibrary/YCNFunctionLibrary.h"
 #include "UIDemo/GameplayTags/YCNGameplayTags.h"
@@ -217,6 +218,44 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 		VideoTab->SetDataDisplayName(FText::FromString(TEXT("视频")));
 
 		RegistryOptionsTabList.Add(VideoTab);
+
+		//显示分类
+		{
+			UYCNListDataObject_Collection* DisplayCategory= NewObject<UYCNListDataObject_Collection>();
+			DisplayCategory->SetDataID(FName("DisplayCategory"));
+			DisplayCategory->SetDataDisplayName(FText::FromString(TEXT("显示")));
+
+			VideoTab->AddDataToChildDataList(DisplayCategory);
+
+			//窗口模式
+			{
+				UYCNListDataObject_StringEnum* WindowMode = NewObject<UYCNListDataObject_StringEnum>();
+				WindowMode->SetDataID(FName("WindowMode"));
+				WindowMode->SetDataDisplayName(FText::FromString(TEXT("窗口模式")));
+				WindowMode->SetDescriptionRichText(FText::FromString(TEXT("选择游戏画面的呈现方式，不同模式会影响输入延迟、切屏便利性及画面性能。")));
+				WindowMode->AddEnumOption(EWindowMode::Fullscreen, FText::FromString(TEXT("独占全屏")));
+				WindowMode->AddEnumOption(EWindowMode::WindowedFullscreen, FText::FromString(TEXT("无边框窗口")));
+				WindowMode->AddEnumOption(EWindowMode::Windowed, FText::FromString(TEXT("窗口化")));
+				WindowMode->SetDefaultValueFromEnumOption(EWindowMode::WindowedFullscreen);
+				WindowMode->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetFullscreenMode));
+				WindowMode->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetFullscreenMode));
+
+				DisplayCategory->AddDataToChildDataList(WindowMode);
+			}
+
+			//分辨率
+			{
+				UYCNListDataObject_Resolution* ScreenResolution = NewObject<UYCNListDataObject_Resolution>();
+				ScreenResolution->SetDataID(FName("ScreenResolution"));
+				ScreenResolution->SetDataDisplayName(FText::FromString(TEXT("屏幕分辨率")));
+				ScreenResolution->SetDescriptionRichText(FText::FromString(TEXT("调整屏幕像素尺寸。分辨率越高画面越清晰，但对显卡性能要求更高。")));
+				ScreenResolution->InitResolutionValue();
+				ScreenResolution->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetScreenResolution));
+				ScreenResolution->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetScreenResolution));
+
+				DisplayCategory->AddDataToChildDataList(ScreenResolution);
+			}
+		}
 	}
 }
 
