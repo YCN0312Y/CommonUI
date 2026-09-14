@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "UIDemo/YCNEnumType.h"
+#include "UIDemo/YCNStructType.h"
 #include "YCNListDataObject_Base.generated.h"
 
 #define LIST_DATA_ACCESSOR(Type, Value)\
@@ -33,15 +34,29 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<UYCNListDataObject_Base>ParentData;
 
+	//编辑条件数组
+	TArray<FOptionDataEditConditionDescriptor>EditConditionArray;
 public:
 	//列表数据修改时委托
 	FOnListDataModifiedDelegate OnListDataModified;
+	//依赖数据修改
+	FOnListDataModifiedDelegate OnDependencyDataModified;
 
 protected:
 	//初始化数据对象
 	virtual void OnDataObjectInitialized();
+
 	//通知修改列表数据
 	virtual void NotifyListDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason = EOptionsListDataModifyReason::DirectlyModified);
+
+	//是否可以设置禁用值
+	virtual bool CanSetDisableValue(const FString& InForcedValue)const { return false; };
+
+	//为禁用选项设置禁用时的值
+	virtual void OnSetDisableValue(const FString& InForcedValue) {};
+
+	//编辑依赖数据修改
+	virtual void OnEditDependencyDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason);
 public:
 	//子类重写函数
 	virtual TArray<UYCNListDataObject_Base*>GetAllChildListData()const { return TArray<UYCNListDataObject_Base*>(); }
@@ -60,6 +75,15 @@ public:
 
 	//初始化数据对象
 	void InitDataObject();
+
+	//添加编辑条件
+	void AddEditCondition(const FOptionDataEditConditionDescriptor& InEditCondition);
+
+	//添加或编辑依赖数据
+	void AddEditDependencyData(UYCNListDataObject_Base* InDependencyData);
+
+	//当前数据是否被禁用
+	bool IsCurrentDataDisabled();
 
 	LIST_DATA_ACCESSOR(FName, DataID);
 	LIST_DATA_ACCESSOR(FText, DataDisplayName);

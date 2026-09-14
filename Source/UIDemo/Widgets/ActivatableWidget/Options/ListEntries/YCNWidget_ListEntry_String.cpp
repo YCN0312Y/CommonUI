@@ -48,6 +48,17 @@ void UYCNWidget_ListEntry_String::OnOwningListDataObjectModified(UYCNListDataObj
 	}
 }
 
+void UYCNWidget_ListEntry_String::OnToggleEditableState(bool bIsEditable)
+{
+	Super::OnToggleEditableState(bIsEditable);
+
+	if (!CommonButton_Last || !CommonRotator_AvailableOptions || !CommonButton_Next)return;
+
+	CommonButton_Last->SetIsEnabled(bIsEditable);
+	CommonRotator_AvailableOptions->SetIsEnabled(bIsEditable);
+	CommonButton_Next->SetIsEnabled(bIsEditable);
+}
+
 void UYCNWidget_ListEntry_String::OnClickedCommonButton_Last()
 {
 	if (CachedOwningStringDataObject)

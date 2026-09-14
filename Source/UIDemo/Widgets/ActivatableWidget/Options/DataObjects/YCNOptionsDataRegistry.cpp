@@ -219,6 +219,7 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 
 		RegistryOptionsTabList.Add(VideoTab);
 
+		UYCNListDataObject_StringEnum* CachedWindowMode = nullptr;
 		//显示分类
 		{
 			UYCNListDataObject_Collection* DisplayCategory= NewObject<UYCNListDataObject_Collection>();
@@ -226,6 +227,15 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 			DisplayCategory->SetDataDisplayName(FText::FromString(TEXT("显示")));
 
 			VideoTab->AddDataToChildDataList(DisplayCategory);
+			FOptionDataEditConditionDescriptor PackagedBuildOnlyCondition;
+			PackagedBuildOnlyCondition.SetEditEditConditionFunc(
+				[]()->bool
+				{
+					const bool bIsInEditor = GIsEditor || GIsPlayInEditorWorld;
+					//如果当前状态在引擎里就返回false
+					return !bIsInEditor;
+				});
+			PackagedBuildOnlyCondition.SetDisableRichReason(TEXT("<Disable>这个选项只能在打包构建后修改</>"));
 
 			//窗口模式
 			{
@@ -239,6 +249,8 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 				WindowMode->SetDefaultValueFromEnumOption(EWindowMode::WindowedFullscreen);
 				WindowMode->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetFullscreenMode));
 				WindowMode->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetFullscreenMode));
+				WindowMode->AddEditCondition(PackagedBuildOnlyCondition);
+				CachedWindowMode = WindowMode;
 
 				DisplayCategory->AddDataToChildDataList(WindowMode);
 			}
@@ -252,6 +264,21 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 				ScreenResolution->InitResolutionValue();
 				ScreenResolution->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetScreenResolution));
 				ScreenResolution->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetScreenResolution));
+
+				ScreenResolution->AddEditCondition(PackagedBuildOnlyCondition);
+
+				FOptionDataEditConditionDescriptor WindowModeEditCondition;
+				WindowModeEditCondition.SetEditEditConditionFunc(
+					[CachedWindowMode]()->bool
+					{
+						if (CachedWindowMode->GetCurrentEnum<EWindowMode::Type>() == EWindowMode::WindowedFullscreen)return false;
+						return true;
+					});
+				WindowModeEditCondition.SetDisableRichReason(TEXT("\n\n<Disable>当窗口模式为无边框窗口时则无法更改屏幕分辨率</>"));
+				WindowModeEditCondition.SetDisableValue(ScreenResolution->GetMaxResolution());
+
+				ScreenResolution->AddEditCondition(WindowModeEditCondition);
+				ScreenResolution->AddEditDependencyData(CachedWindowMode);
 
 				DisplayCategory->AddDataToChildDataList(ScreenResolution);
 			}

@@ -52,6 +52,25 @@ bool UYCNListDataObject_String::TryResetBackToDefaultVaule()
 	return false;
 }
 
+bool UYCNListDataObject_String::CanSetDisableValue(const FString& InForcedValue) const
+{
+	//如果当前字符串值不是禁用时的字符串值则为真
+	return CurrentStringValue != InForcedValue;
+}
+
+void UYCNListDataObject_String::OnSetDisableValue(const FString& InForcedValue)
+{
+	CurrentStringValue = InForcedValue;
+
+	TryResetBackToDefaultVaule();
+	if (DataDynamciSetter)
+	{
+		DataDynamciSetter->SetValudFromString(CurrentStringValue);
+
+		NotifyListDataModified(this, EOptionsListDataModifyReason::DependencyModified);
+	}
+}
+
 void UYCNListDataObject_String::AddDynamicOption(const FString& InStringValue, const FText& InTextValue)
 {
 	if (InStringValue.IsEmpty() || InTextValue.IsEmpty())return;

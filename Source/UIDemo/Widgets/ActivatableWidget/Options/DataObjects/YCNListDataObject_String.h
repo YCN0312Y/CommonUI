@@ -14,10 +14,18 @@ class UIDEMO_API UYCNListDataObject_String : public UYCNListDataObject_Value
 protected:
 	//UYCNListDataObject_Base继承函数
 	virtual void OnDataObjectInitialized()override;
+
 	//可重置为默认值
 	virtual bool CanResetBackToDefaultVaule()const override;
+
 	//尝试重置为默认值
 	virtual bool TryResetBackToDefaultVaule()override;
+
+	//是否可以设置禁用值
+	virtual bool CanSetDisableValue(const FString& InForcedValue)const override;
+
+	//为禁用选项设置禁用时的值
+	virtual void OnSetDisableValue(const FString& InForcedValue)override;
 	
 protected:
 	//当前字符串值

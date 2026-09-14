@@ -17,8 +17,14 @@ class UIDEMO_API UYCNWidget_ListEntry_String : public UYCNWidget_ListEntry_Base
 
 protected:
 	virtual void NativeOnInitialized()override;
+	//当前条目被分配了一个列表数据对象
 	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject)override;
+
+	//当前条目关联的数据被修改
 	virtual void OnOwningListDataObjectModified(UYCNListDataObject_Base* InOwningModifiedData, EOptionsListDataModifyReason InModifyReason)override;
+
+	//设置数据是否被禁用
+	virtual void OnToggleEditableState(bool bIsEditable)override;
 
 private:
 	//上一个

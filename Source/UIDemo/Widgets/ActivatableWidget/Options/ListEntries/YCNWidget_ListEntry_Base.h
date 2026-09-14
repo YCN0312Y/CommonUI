@@ -19,16 +19,28 @@ class UIDEMO_API UYCNWidget_ListEntry_Base : public UCommonUserWidget, public IU
 protected:
 	//切换主标签的时候自动调用
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
+
 	//选择按钮回调函数
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
+
 	//当前条目被分配了一个列表数据对象
 	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject);
+
 	//当前条目关联的数据被修改
 	virtual void OnOwningListDataObjectModified(UYCNListDataObject_Base* InOwningModifiedData, EOptionsListDataModifyReason InModifyReason);
+
+	//设置数据是否被禁用
+	virtual void OnToggleEditableState(bool bIsEditable);
+
+
+	virtual void OnOwningDependencyDataObjectModified(UYCNListDataObject_Base* InOwningModifiedDependencyData, EOptionsListDataModifyReason InModifyReason);
 
 private:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, AllowPrivateAccess = "true"))
 	TObjectPtr<UCommonTextBlock>CommonText_SettingDisplayName;
+
+	UPROPERTY()
+	UYCNListDataObject_Base* CachedOwningDataObject;
 
 protected:
 	void SelectThisEntryWidget();

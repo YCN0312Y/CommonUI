@@ -29,9 +29,9 @@ void UYCNWidget_OptionsDetailsView::UpdateDetailsViewInfo(UYCNListDataObject_Bas
 		CommonImage_DescriptionImage->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	CommonRichText_Description->SetText(InDataObject->GetDescriptionRichText());
-	const FString DynamicDetails = FString::Printf(TEXT("<HighLight>数据对象类: </>%s"), *InEntryWidgetClassName);
-	CommonRichText_DynamicDetails->SetText(FText::FromString(DynamicDetails));
-	CommonRichText_DisabledReason->SetText(InDataObject->GetDisabledRichText());
+	CommonRichText_DynamicDetails->SetText(FText::FromString(FString::Printf(TEXT("<HighLight>数据对象类: </>%s"), *InEntryWidgetClassName)));
+	//根据当前数据是否被禁用设置文本
+	CommonRichText_DisabledReason->SetText(InDataObject->IsCurrentDataDisabled() ? FText::GetEmpty() : InDataObject->GetDisabledRichText());
 }
 
 void UYCNWidget_OptionsDetailsView::ClearDetailsViewInfo()

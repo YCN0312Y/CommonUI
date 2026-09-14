@@ -14,8 +14,18 @@ class UIDEMO_API UYCNListDataObject_Resolution : public UYCNListDataObject_Strin
 
 protected:
 	//UYCNListDataObject_Base继承函数
-	virtual void OnDataObjectInitialized()override;
-	
+	virtual void OnDataObjectInitialized()override;	
 public:
+	//初始化分辨率值
 	void InitResolutionValue();
+	//获取最大分辨率
+	FString GetMaxResolution()const { return MaxResolution; }
+private:
+	//分辨率值转FString
+	FString ResToValueString(const FIntPoint& InResolution);
+	//分辨率值转FText
+	FText ResToValueText(const FIntPoint& InResolution);
+	//最大分辨率
+	FString MaxResolution;
+
 };

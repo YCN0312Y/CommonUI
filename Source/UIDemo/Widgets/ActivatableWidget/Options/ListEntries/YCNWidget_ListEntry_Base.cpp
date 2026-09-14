@@ -35,11 +35,31 @@ void UYCNWidget_ListEntry_Base::OnOwningListDataObjectSet(UYCNListDataObject_Bas
 			InOwningListDataObject->OnListDataModified.AddUObject(this, &UYCNWidget_ListEntry_Base::OnOwningListDataObjectModified);
 		}
 	}
+	if (!InOwningListDataObject->OnDependencyDataModified.IsBoundToObject(this))
+	{
+		InOwningListDataObject->OnDependencyDataModified.AddUObject(this, &UYCNWidget_ListEntry_Base::OnOwningDependencyDataObjectModified);
+	}
+	OnToggleEditableState(InOwningListDataObject->IsCurrentDataDisabled());
+	CachedOwningDataObject = InOwningListDataObject;
 }
 
 void UYCNWidget_ListEntry_Base::OnOwningListDataObjectModified(UYCNListDataObject_Base* InOwningModifiedData, EOptionsListDataModifyReason InModifyReason)
 {
 
+}
+
+void UYCNWidget_ListEntry_Base::OnToggleEditableState(bool bIsEditable)
+{
+	if (!CommonText_SettingDisplayName)return;
+
+	CommonText_SettingDisplayName->SetIsEnabled(bIsEditable);
+}
+
+void UYCNWidget_ListEntry_Base::OnOwningDependencyDataObjectModified(UYCNListDataObject_Base* InOwningModifiedDependencyData, EOptionsListDataModifyReason InModifyReason)
+{
+	if (!InOwningModifiedDependencyData || !CachedOwningDataObject)return;
+
+	OnToggleEditableState(InOwningModifiedDependencyData->IsCurrentDataDisabled());
 }
 
 void UYCNWidget_ListEntry_Base::SelectThisEntryWidget()
