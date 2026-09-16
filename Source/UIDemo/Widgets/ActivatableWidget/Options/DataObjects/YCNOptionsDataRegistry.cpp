@@ -228,7 +228,7 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 
 			VideoTab->AddDataToChildDataList(DisplayCategory);
 			FOptionDataEditConditionDescriptor PackagedBuildOnlyCondition;
-			PackagedBuildOnlyCondition.SetEditEditConditionFunc(
+			PackagedBuildOnlyCondition.SetEditConditionFunc(
 				[]()->bool
 				{
 					const bool bIsInEditor = GIsEditor || GIsPlayInEditorWorld;
@@ -250,8 +250,9 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 				WindowMode->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetFullscreenMode));
 				WindowMode->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetFullscreenMode));
 				WindowMode->AddEditCondition(PackagedBuildOnlyCondition);
+				WindowMode->SetbApplyImmediately(true);
 				CachedWindowMode = WindowMode;
-
+				
 				DisplayCategory->AddDataToChildDataList(WindowMode);
 			}
 
@@ -264,11 +265,11 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 				ScreenResolution->InitResolutionValue();
 				ScreenResolution->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetScreenResolution));
 				ScreenResolution->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetScreenResolution));
-
+				ScreenResolution->SetbApplyImmediately(true);
 				ScreenResolution->AddEditCondition(PackagedBuildOnlyCondition);
 
 				FOptionDataEditConditionDescriptor WindowModeEditCondition;
-				WindowModeEditCondition.SetEditEditConditionFunc(
+				WindowModeEditCondition.SetEditConditionFunc(
 					[CachedWindowMode]()->bool
 					{
 						if (CachedWindowMode->GetCurrentEnum<EWindowMode::Type>() == EWindowMode::WindowedFullscreen)return false;
@@ -279,8 +280,284 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 
 				ScreenResolution->AddEditCondition(WindowModeEditCondition);
 				ScreenResolution->AddEditDependencyData(CachedWindowMode);
-
+				
 				DisplayCategory->AddDataToChildDataList(ScreenResolution);
+			}
+		}
+		//图像分类
+		{
+			UYCNListDataObject_Collection* GraphicsCategory = NewObject<UYCNListDataObject_Collection>();
+			GraphicsCategory->SetDataID(FName("GraphicsCategory"));
+			GraphicsCategory->SetDataDisplayName(FText::FromString(TEXT("图像")));
+
+			VideoTab->AddDataToChildDataList(GraphicsCategory);
+			//亮度
+			{
+				UYCNListDataObject_Scalar* DiaplayGamma = NewObject<UYCNListDataObject_Scalar>();
+				DiaplayGamma->SetDataID(FName("DiaplayGamma"));
+				DiaplayGamma->SetDataDisplayName(FText::FromString(TEXT("亮度")));
+				DiaplayGamma->SetDescriptionRichText(FText::FromString(TEXT("调节游戏画面的整体明暗程度。如果画面过暗，可以适当调高此数值。")));
+				DiaplayGamma->SetDisplayValueRange(TRange<float>(0.f, 1.f));
+				DiaplayGamma->SetOutputValueRange(TRange<float>(1.1f, 3.3f));
+				DiaplayGamma->SetDisplayNumericType(ECommonNumericType::Percentage);
+				DiaplayGamma->SetNumberFormattingOptions(UYCNListDataObject_Scalar::NoDecimal());
+				DiaplayGamma->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentDiaplayGamma));
+				DiaplayGamma->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetCurrentDiaplayGamma));
+				DiaplayGamma->SetDefaultStringValue(LexToString(2.2f));
+				DiaplayGamma->SetbApplyImmediately(true);
+				GraphicsCategory->AddDataToChildDataList(DiaplayGamma);
+			}
+
+			UYCNListDataObject_StringNumber* CachedOverallQuality = nullptr;
+			//整体画质
+			{
+				UYCNListDataObject_StringNumber* OverallQuality = NewObject<UYCNListDataObject_StringNumber>();
+				OverallQuality->SetDataID(FName("OverallQuality"));
+				OverallQuality->SetDataDisplayName(FText::FromString(TEXT("画面质量")));
+				OverallQuality->SetDescriptionRichText(FText::FromString(TEXT("调节游戏整体的图形渲染精度。降低画质可提升运行流畅度，提高画质可获得更精细的视觉效果。")));
+				OverallQuality->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				OverallQuality->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				OverallQuality->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				OverallQuality->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				OverallQuality->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				OverallQuality->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetOverallScalabilityLevel));
+				OverallQuality->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetOverallScalabilityLevel));
+				OverallQuality->SetDefaultStringValue(LexToString(1));
+				OverallQuality->SetbApplyImmediately(true);
+				CachedOverallQuality = OverallQuality;
+				GraphicsCategory->AddDataToChildDataList(OverallQuality);
+			}
+
+			//分辨率缩放
+			{
+				UYCNListDataObject_StringNumber* ResolutionScale = NewObject<UYCNListDataObject_StringNumber>();
+				ResolutionScale->SetDataID(FName("ResolutionScale"));
+				ResolutionScale->SetDataDisplayName(FText::FromString(TEXT("分辨率大小")));
+				ResolutionScale->SetDescriptionRichText(FText::FromString(TEXT("决定画面的像素点数量。分辨率越高，画面边缘与细节越清晰，但会显著增加显卡性能开销。")));
+				ResolutionScale->AddNumberOptions<float>(50.f, FText::FromString(TEXT("低")));
+				ResolutionScale->AddNumberOptions<float>(71.f, FText::FromString(TEXT("中")));
+				ResolutionScale->AddNumberOptions<float>(87.f, FText::FromString(TEXT("高")));
+				ResolutionScale->AddNumberOptions<float>(100.f, FText::FromString(TEXT("极高")));
+				ResolutionScale->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetCurrentResolutionScalePercent));
+				ResolutionScale->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetResolutionScaleValueEx));
+				ResolutionScale->SetDefaultStringValue(LexToString(71.f));
+				ResolutionScale->SetbApplyImmediately(true);
+
+				ResolutionScale->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(ResolutionScale);
+
+				GraphicsCategory->AddDataToChildDataList(ResolutionScale);
+			}
+			//可视距离
+			{
+				UYCNListDataObject_StringNumber* ViewDistance = NewObject<UYCNListDataObject_StringNumber>();
+				ViewDistance->SetDataID(FName("ViewDistance"));
+				ViewDistance->SetDataDisplayName(FText::FromString(TEXT("可视距离")));
+				ViewDistance->SetDescriptionRichText(FText::FromString(TEXT("控制远处物体、建筑和地形的渲染范围。调高此项可减少远景突然出现的现象，但会消耗较多CPU和GPU资源。")));
+				ViewDistance->AddNumberOptions<int32>(0, FText::FromString(TEXT("近")));
+				ViewDistance->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				ViewDistance->AddNumberOptions<int32>(2, FText::FromString(TEXT("远")));
+				ViewDistance->AddNumberOptions<int32>(3, FText::FromString(TEXT("极远")));
+				ViewDistance->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				ViewDistance->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetViewDistanceQuality));
+				ViewDistance->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetViewDistanceQuality));
+				ViewDistance->SetDefaultStringValue(LexToString(1));
+				ViewDistance->SetbApplyImmediately(true);
+
+				ViewDistance->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(ViewDistance);
+
+				GraphicsCategory->AddDataToChildDataList(ViewDistance);
+			}
+			//全局光照
+			{
+				UYCNListDataObject_StringNumber* GlobalIllumination = NewObject<UYCNListDataObject_StringNumber>();
+				GlobalIllumination->SetDataID(FName("GlobalIllumination"));
+				GlobalIllumination->SetDataDisplayName(FText::FromString(TEXT("全局光照"))); 
+				GlobalIllumination->SetDescriptionRichText(FText::FromString(TEXT("控制光线在场景表面的反射和漫反射。开启或调高此项能让阴影更自然、光影更柔和，但会带来较大的性能开销。")));
+				GlobalIllumination->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				GlobalIllumination->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				GlobalIllumination->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				GlobalIllumination->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				GlobalIllumination->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				GlobalIllumination->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetGlobalIlluminationQuality));
+				GlobalIllumination->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetGlobalIlluminationQuality));
+				GlobalIllumination->SetDefaultStringValue(LexToString(1));
+				GlobalIllumination->SetbApplyImmediately(true);
+
+				GlobalIllumination->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(GlobalIllumination);
+
+				GraphicsCategory->AddDataToChildDataList(GlobalIllumination);
+			}
+			//阴影
+			{
+				UYCNListDataObject_StringNumber* ShadowQuality = NewObject<UYCNListDataObject_StringNumber>();
+				ShadowQuality->SetDataID(FName("ShadowQuality"));
+				ShadowQuality->SetDataDisplayName(FText::FromString(TEXT("阴影质量")));
+				ShadowQuality->SetDescriptionRichText(FText::FromString(TEXT("控制光线在场景表面的反射和漫反射。开启或调高此项能让阴影更自然、光影更柔和，但会带来较大的性能开销。")));
+				ShadowQuality->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				ShadowQuality->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				ShadowQuality->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				ShadowQuality->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				ShadowQuality->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				ShadowQuality->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetShadowQuality));
+				ShadowQuality->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetShadowQuality));
+				ShadowQuality->SetDefaultStringValue(LexToString(1));
+				ShadowQuality->SetbApplyImmediately(true);
+
+				ShadowQuality->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(ShadowQuality);
+
+				GraphicsCategory->AddDataToChildDataList(ShadowQuality);
+			}
+
+			//抗锯齿质量
+			{
+				UYCNListDataObject_StringNumber* AntiAliasingQuality = NewObject<UYCNListDataObject_StringNumber>();
+				AntiAliasingQuality->SetDataID(FName("AntiAliasingQuality"));
+				AntiAliasingQuality->SetDataDisplayName(FText::FromString(TEXT("抗锯齿质量")));
+				AntiAliasingQuality->SetDescriptionRichText(FText::FromString(TEXT("消除物体边缘的“锯齿状”毛边，让线条和平滑过渡更自然。")));
+				AntiAliasingQuality->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				AntiAliasingQuality->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				AntiAliasingQuality->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				AntiAliasingQuality->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				AntiAliasingQuality->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				AntiAliasingQuality->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetAntiAliasingQuality));
+				AntiAliasingQuality->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetAntiAliasingQuality));
+				AntiAliasingQuality->SetDefaultStringValue(LexToString(1));
+				AntiAliasingQuality->SetbApplyImmediately(true);
+
+				AntiAliasingQuality->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(AntiAliasingQuality);
+
+				GraphicsCategory->AddDataToChildDataList(AntiAliasingQuality);
+			}
+			//后期处理
+			{
+				UYCNListDataObject_StringNumber* PostProcessing = NewObject<UYCNListDataObject_StringNumber>();
+				PostProcessing->SetDataID(FName("PostProcessing"));
+				PostProcessing->SetDataDisplayName(FText::FromString(TEXT("后期处理")));
+				PostProcessing->SetDescriptionRichText(FText::FromString(TEXT("控制画面整体的氛围渲染与视觉特效（如泛光、景深、环境光遮蔽等），增强画面的电影感与真实感。")));
+				PostProcessing->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				PostProcessing->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				PostProcessing->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				PostProcessing->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				PostProcessing->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				PostProcessing->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetPostProcessingQuality));
+				PostProcessing->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetPostProcessingQuality));
+				PostProcessing->SetDefaultStringValue(LexToString(1));
+				PostProcessing->SetbApplyImmediately(true);
+
+				PostProcessing->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(PostProcessing);
+
+				GraphicsCategory->AddDataToChildDataList(PostProcessing);
+			}
+			//反射质量
+			{
+				UYCNListDataObject_StringNumber* Reflections = NewObject<UYCNListDataObject_StringNumber>();
+				Reflections->SetDataID(FName("Reflections"));
+				Reflections->SetDataDisplayName(FText::FromString(TEXT("反射质量")));
+				Reflections->SetDescriptionRichText(FText::FromString(TEXT("决定水面、镜面及光滑表面的反射清晰度与准确度。调高此项能带来更逼真的反射效果。")));
+				Reflections->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				Reflections->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				Reflections->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				Reflections->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				Reflections->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				Reflections->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetReflectionQuality));
+				Reflections->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetReflectionQuality));
+				Reflections->SetDefaultStringValue(LexToString(1));
+				Reflections->SetbApplyImmediately(true);
+
+				Reflections->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(Reflections);
+
+				GraphicsCategory->AddDataToChildDataList(Reflections);
+			}
+			//贴图质量
+			{
+				UYCNListDataObject_StringNumber* Textures = NewObject<UYCNListDataObject_StringNumber>();
+				Textures->SetDataID(FName("Textures"));
+				Textures->SetDataDisplayName(FText::FromString(TEXT("贴图质量")));
+				Textures->SetDescriptionRichText(FText::FromString(TEXT("控制物体纹理的清晰度。主要消耗显存，显存足够时对帧率影响较小。")));
+				Textures->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				Textures->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				Textures->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				Textures->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				Textures->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				Textures->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetTextureQuality));
+				Textures->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetTextureQuality));
+				Textures->SetDefaultStringValue(LexToString(1));
+				Textures->SetbApplyImmediately(true);
+
+				Textures->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(Textures);
+
+				GraphicsCategory->AddDataToChildDataList(Textures);
+			}
+			//特效质量
+			{
+				UYCNListDataObject_StringNumber* Effects = NewObject<UYCNListDataObject_StringNumber>();
+				Effects->SetDataID(FName("Effects"));
+				Effects->SetDataDisplayName(FText::FromString(TEXT("特效质量")));
+				Effects->SetDescriptionRichText(FText::FromString(TEXT("决定爆炸、火焰、烟雾等粒子特效的复杂程度与数量。在激烈战斗中降低此项有助于保持帧率稳定。")));
+				Effects->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				Effects->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				Effects->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				Effects->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				Effects->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				Effects->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetVisualEffectQuality));
+				Effects->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetVisualEffectQuality));
+				Effects->SetDefaultStringValue(LexToString(1));
+				Effects->SetbApplyImmediately(true);
+
+				Effects->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(Effects);
+
+				GraphicsCategory->AddDataToChildDataList(Effects);
+			}
+			//植物质量
+			{
+				UYCNListDataObject_StringNumber* Foliage = NewObject<UYCNListDataObject_StringNumber>();
+				Foliage->SetDataID(FName("Foliage"));
+				Foliage->SetDataDisplayName(FText::FromString(TEXT("植物质量")));
+				Foliage->SetDescriptionRichText(FText::FromString(TEXT("控制草丛、树木的密度、渲染范围及风吹动时的动态表现。调高此项可使野外场景更茂密真实。")));
+				Foliage->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				Foliage->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				Foliage->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				Foliage->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				Foliage->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				Foliage->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetFoliageQuality));
+				Foliage->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetFoliageQuality));
+				Foliage->SetDefaultStringValue(LexToString(1));
+				Foliage->SetbApplyImmediately(true);
+
+				Foliage->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(Foliage);
+
+				GraphicsCategory->AddDataToChildDataList(Foliage);
+			}
+			//着色质量
+			{
+				UYCNListDataObject_StringNumber* Shading = NewObject<UYCNListDataObject_StringNumber>();
+				Shading->SetDataID(FName("Shading"));
+				Shading->SetDataDisplayName(FText::FromString(TEXT("着色质量")));
+				Shading->SetDescriptionRichText(FText::FromString(TEXT("决定材质表面的光照计算与表面细节表现。高设置下能呈现更好的材质质感，但会增加显卡渲染负担。")));
+				Shading->AddNumberOptions<int32>(0, FText::FromString(TEXT("低")));
+				Shading->AddNumberOptions<int32>(1, FText::FromString(TEXT("中")));
+				Shading->AddNumberOptions<int32>(2, FText::FromString(TEXT("高")));
+				Shading->AddNumberOptions<int32>(3, FText::FromString(TEXT("极高")));
+				Shading->AddNumberOptions<int32>(4, FText::FromString(TEXT("影视级")));
+				Shading->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetShadingQuality));
+				Shading->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetShadingQuality));
+				Shading->SetDefaultStringValue(LexToString(1));
+				Shading->SetbApplyImmediately(true);
+
+				Shading->AddEditDependencyData(CachedOverallQuality);
+				CachedOverallQuality->AddEditDependencyData(Shading);
+
+				GraphicsCategory->AddDataToChildDataList(Shading);
 			}
 		}
 	}

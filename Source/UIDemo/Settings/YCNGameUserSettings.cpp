@@ -24,3 +24,24 @@ UYCNGameUserSettings* UYCNGameUserSettings::Get()
 
 	return nullptr;
 }
+
+void UYCNGameUserSettings::SetCurrentDiaplayGamma(float InNewGamma)
+{
+	if (GEngine)
+	{
+		GEngine->DisplayGamma = InNewGamma;
+	}
+}
+
+float UYCNGameUserSettings::GetCurrentDiaplayGamma() const
+{
+	if (GEngine)
+	{
+		return GEngine->GetDisplayGamma();
+	}
+	return 0.0f;
+}
+float UYCNGameUserSettings::GetCurrentResolutionScalePercent() const
+{
+	return ScalabilityQuality.ResolutionQuality;
+}

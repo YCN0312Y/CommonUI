@@ -36,6 +36,9 @@ private:
 
 	//编辑条件数组
 	TArray<FOptionDataEditConditionDescriptor>EditConditionArray;
+	
+	//是否立即应用设置
+	bool bApplyImmediately = false;;
 public:
 	//列表数据修改时委托
 	FOnListDataModifiedDelegate OnListDataModified;
@@ -85,6 +88,7 @@ public:
 	//当前数据是否被禁用
 	bool IsCurrentDataDisabled();
 
+	LIST_DATA_ACCESSOR(bool, bApplyImmediately);
 	LIST_DATA_ACCESSOR(FName, DataID);
 	LIST_DATA_ACCESSOR(FText, DataDisplayName);
 	LIST_DATA_ACCESSOR(FText, DescriptionRichText);

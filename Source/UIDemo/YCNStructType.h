@@ -20,7 +20,7 @@ public:
 	/*
 	* EditConditionFunc
 	*/
-	void SetEditEditConditionFunc(TFunction<bool()> InEditConditionFunc)
+	void SetEditConditionFunc(TFunction<bool()> InEditConditionFunc)
 	{
 		EditConditionFunc = InEditConditionFunc;
 	}

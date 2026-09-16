@@ -111,3 +111,23 @@ public:
 		return (EnumType)StaticEnumOption->GetValueByNameString(CurrentStringValue);
 	}
 };
+
+UCLASS()
+class UIDEMO_API UYCNListDataObject_StringNumber : public UYCNListDataObject_String
+{
+	GENERATED_BODY()
+
+protected:
+	//UYCNListDataObject_Base继承函数
+	virtual void OnDataObjectInitialized()override;
+
+	//编辑依赖数据修改
+	virtual void OnEditDependencyDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason)override;
+
+public:
+	template<typename NumberType>
+	void AddNumberOptions(NumberType InValue, const FText& InDisplayText)
+	{
+		AddDynamicOption(LexToString(InValue), InDisplayText);
+	}
+};

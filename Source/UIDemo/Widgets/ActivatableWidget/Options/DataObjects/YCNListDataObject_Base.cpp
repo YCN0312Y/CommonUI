@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Base.h"
+#include "UIDemo/Settings/YCNGameUserSettings.h"
 
 void UYCNListDataObject_Base::OnDataObjectInitialized()
 {
@@ -10,6 +11,11 @@ void UYCNListDataObject_Base::OnDataObjectInitialized()
 void UYCNListDataObject_Base::NotifyListDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason)
 {
 	OnListDataModified.Broadcast(InModifiedData, InModifyReason);
+
+	if (bApplyImmediately)
+	{
+		UYCNGameUserSettings::Get()->ApplySettings(true);
+	}
 }
 
 void UYCNListDataObject_Base::OnEditDependencyDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason)
@@ -31,8 +37,9 @@ void UYCNListDataObject_Base::AddEditCondition(const FOptionDataEditConditionDes
 
 void UYCNListDataObject_Base::AddEditDependencyData(UYCNListDataObject_Base* InDependencyData)
 {
-	if (InDependencyData || !InDependencyData->OnListDataModified.IsBoundToObject(this))
+	if (InDependencyData && !InDependencyData->OnListDataModified.IsBoundToObject(this))
 	{
+		//UYCNListDataObject_StringEnum
 		InDependencyData->OnListDataModified.AddUObject(this, &UYCNListDataObject_Base::OnEditDependencyDataModified);
 	}
 }

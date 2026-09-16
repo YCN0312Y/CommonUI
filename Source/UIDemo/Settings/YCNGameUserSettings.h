@@ -35,6 +35,7 @@ private:
 	//缓存的是否启用HDR模式
 	UPROPERTY(Config)
 	bool CachedUseHDRAudioMode;
+
 public:
 	//设置缓存游戏难度
 	UFUNCTION()
@@ -77,4 +78,16 @@ public:
 	//获取缓存的是否启用HDR模式
 	UFUNCTION()
 	bool GetCachedUseHDRAudioMode()const { return CachedUseHDRAudioMode; }
+
+	//设置亮度值
+	UFUNCTION()
+	void SetCurrentDiaplayGamma(float InNewGamma);
+	//获取亮度值
+	UFUNCTION()
+	float GetCurrentDiaplayGamma()const;
+
+	//获取分辨率缩放百分比
+	UFUNCTION()
+	float GetCurrentResolutionScalePercent() const;
+
 };

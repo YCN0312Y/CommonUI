@@ -153,6 +153,7 @@ bool UYCNListDataObject_String::TrySetDisplayTextFromStringValue(const FString& 
 }
 
 /************************************UYCNListDataObject_StringBool************************************/
+
 void UYCNListDataObject_StringBool::OnDataObjectInitialized()
 {
 	TryInitBoolValue();
@@ -196,4 +197,34 @@ void UYCNListDataObject_StringBool::SetTrueDefaultValue()
 void UYCNListDataObject_StringBool::SetFlaseDefaultValue()
 {
 	SetDefaultStringValue(FalseString);
+}
+
+/************************************UYCNListDataObject_StringNumber************************************/
+
+void UYCNListDataObject_StringNumber::OnDataObjectInitialized()
+{
+	Super::OnDataObjectInitialized();
+
+	if (!TrySetDisplayTextFromStringValue(CurrentStringValue))
+	{
+		CurrentTextValue = FText::FromString(TEXT("自定义"));
+	}
+}
+
+void UYCNListDataObject_StringNumber::OnEditDependencyDataModified(UYCNListDataObject_Base* InModifiedData, EOptionsListDataModifyReason InModifyReason)
+{
+	if (DataDynamciGetter)
+	{
+		if (CurrentStringValue == DataDynamciGetter->GetValudFromString())return;
+
+		CurrentStringValue = DataDynamciGetter->GetValudFromString();
+
+		if (!TrySetDisplayTextFromStringValue(CurrentStringValue))
+		{
+			CurrentTextValue = FText::FromString(TEXT("自定义"));
+		}
+
+		NotifyListDataModified(this, EOptionsListDataModifyReason::DependencyModified);
+	}
+	Super::OnEditDependencyDataModified(InModifiedData, InModifyReason);
 }

@@ -78,4 +78,3 @@ void UYCNWidget_ListEntry_String::OnClickedCommonButton_Next()
 	//点击 下一个 的时候就把当前这个子标题变成选择的子标题
 	SelectThisEntryWidget();
 }
-
