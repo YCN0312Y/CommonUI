@@ -36,6 +36,17 @@ local M = UnLua.Class()
 
 function M:ReceivePossess(PossessedPawn)
 
+    
+    local EnhancedInputLocalPlayerSubsytem = UE.USubsystemBlueprintLibrary.GetLocalPlayerSubsystem(self, UE.UEnhancedInputLocalPlayerSubsystem)
+    if EnhancedInputLocalPlayerSubsytem then
+        print("1")
+        local UserSettings = EnhancedInputLocalPlayerSubsytem:GetUserSettings()
+        if UserSettings and self.IMC_Default then
+            UserSettings:RegisterInputMappingContext(self.IMC_Default)
+        end
+  
+    end
+
     if self.MainLayoutClass then
         --主控件
         local MainLayout = UE.UWidgetBlueprintLibrary.Create(self, self.MainLayoutClass, self)
@@ -64,6 +75,7 @@ function M:ReceivePossess(PossessedPawn)
 
         end
     end
+
 end
 
 return M

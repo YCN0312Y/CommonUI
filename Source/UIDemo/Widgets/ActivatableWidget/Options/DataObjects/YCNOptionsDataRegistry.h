@@ -24,7 +24,7 @@ private:
 	void InitGameplayCollectionTab();
 	void InitAudioCollectionTab();
 	void InitVideoCollectionTab();
-	void InitControlCollectionTab();
+	void InitControlCollectionTab(ULocalPlayer* InOwningLocalPlayer);
 	//递归查找子列表数据
 	void FindChildListDataRecursively(UYCNListDataObject_Base* InParentData, TArray<UYCNListDataObject_Base*>& OutFoundChaildListData)const;
 

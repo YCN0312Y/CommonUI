@@ -9,6 +9,9 @@
 #include "UIDemo/FunctionLibrary/YCNFunctionLibrary.h"
 #include "UIDemo/GameplayTags/YCNGameplayTags.h"
 #include "UIDemo/Settings/YCNGameUserSettings.h"
+#include "EnhancedInputSubsystems.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
+#include "UIDemo/YCNDebugHelper.h"
 
 #define MAKE_OPTIONS_DATA_CONTROL(SetterOrGatterFuncName)\
 MakeShared<FYCNOptionsDataInteractionHelper>(GET_FUNCTION_NAME_STRING_CHECKED(UYCNGameUserSettings, SetterOrGatterFuncName))
@@ -18,7 +21,7 @@ void UYCNOptionsDataRegistry::InitOptionsDataRegistry(ULocalPlayer* InOwningLoca
 	InitGameplayCollectionTab();
 	InitAudioCollectionTab();
 	InitVideoCollectionTab();
-	InitControlCollectionTab();
+	InitControlCollectionTab(InOwningLocalPlayer);
 }
 
 TArray<UYCNListDataObject_Base*> UYCNOptionsDataRegistry::GetListSourceItemBySelectedTabID(const FName& InSelectedTabID)const
@@ -560,18 +563,107 @@ void UYCNOptionsDataRegistry::InitVideoCollectionTab()
 				GraphicsCategory->AddDataToChildDataList(Shading);
 			}
 		}
+		//高级图像分类
+		{
+			UYCNListDataObject_Collection* AdvancedGraphicsCategory = NewObject<UYCNListDataObject_Collection>();
+			AdvancedGraphicsCategory->SetDataID(FName("AdvancedGraphicsCategory"));
+			AdvancedGraphicsCategory->SetDataDisplayName(FText::FromString(TEXT("高级图像")));
+
+			VideoTab->AddDataToChildDataList(AdvancedGraphicsCategory);
+
+			//垂直同步
+			{
+				UYCNListDataObject_StringBool* VerticalSync = NewObject<UYCNListDataObject_StringBool>();
+				VerticalSync->SetDataID(FName("VerticalSync"));
+				VerticalSync->SetDataDisplayName(FText::FromString(TEXT("垂直同步")));
+				VerticalSync->SetDescriptionRichText(FText::FromString(TEXT("将游戏帧率与显示器刷新率同步，以消除画面撕裂现象。")));
+				VerticalSync->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(IsVSyncEnabled));
+				VerticalSync->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetVSyncEnabled));
+				VerticalSync->SetFlaseDefaultValue();
+				VerticalSync->SetbApplyImmediately(true);
+
+				FOptionDataEditConditionDescriptor FullscreenOnly;//仅限全屏时
+
+				FullscreenOnly.SetEditConditionFunc(
+					[CachedWindowMode]()->bool
+					{
+						return CachedWindowMode->GetCurrentEnum<EWindowMode::Type>() == EWindowMode::Fullscreen;
+					});
+				FullscreenOnly.SetDisableRichReason(TEXT("<Disabled>此功能仅在窗口模式为独占全屏时可更改。</>"));
+				FullscreenOnly.SetDisableValue(TEXT("false"));
+				VerticalSync->AddEditCondition(FullscreenOnly);
+
+				AdvancedGraphicsCategory->AddDataToChildDataList(VerticalSync);
+			}
+			//帧率
+			{
+				UYCNListDataObject_String* FrameRate = NewObject<UYCNListDataObject_String>();
+				FrameRate->SetDataID(FName("FrameRate"));
+				FrameRate->SetDataDisplayName(FText::FromString(TEXT("帧率")));
+				FrameRate->SetDescriptionRichText(FText::FromString(TEXT("限制游戏运行的最大帧率，以平衡画面流畅度与硬件功耗。")));
+				FrameRate->AddDynamicOption(LexToString(30.f), FText::FromString(TEXT("30 FPS")));
+				FrameRate->AddDynamicOption(LexToString(45.f), FText::FromString(TEXT("45 FPS")));
+				FrameRate->AddDynamicOption(LexToString(60.f), FText::FromString(TEXT("60 FPS")));
+				FrameRate->AddDynamicOption(LexToString(90.f), FText::FromString(TEXT("90 FPS")));
+				FrameRate->AddDynamicOption(LexToString(120.f), FText::FromString(TEXT("120 FPS")));
+				FrameRate->AddDynamicOption(LexToString(0.f), FText::FromString(TEXT("无限制")));
+				FrameRate->SetDataDynamicGetter(MAKE_OPTIONS_DATA_CONTROL(GetFrameRateLimit));
+				FrameRate->SetDataDynamicSetter(MAKE_OPTIONS_DATA_CONTROL(SetFrameRateLimit));
+				FrameRate->SetDefaultStringValue(LexToString(0.f));
+				FrameRate->SetbApplyImmediately(true);
+
+				AdvancedGraphicsCategory->AddDataToChildDataList(FrameRate);
+			}
+		}
 	}
 }
 
-void UYCNOptionsDataRegistry::InitControlCollectionTab()
+void UYCNOptionsDataRegistry::InitControlCollectionTab(ULocalPlayer* InOwningLocalPlayer)
 {
 	UYCNListDataObject_Collection* ControlTab = NewObject<UYCNListDataObject_Collection>();
-	if (ControlTab)
-	{
-		ControlTab->SetDataID(FName("Control"));
-		ControlTab->SetDataDisplayName(FText::FromString(TEXT("控制")));
+	ControlTab->SetDataID(FName("Control"));
+	ControlTab->SetDataDisplayName(FText::FromString(TEXT("控制")));
 
-		RegistryOptionsTabList.Add(ControlTab);
+	RegistryOptionsTabList.Add(ControlTab);
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = InOwningLocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (!Subsystem)return;
+	UEnhancedInputUserSettings* UserSetting = Subsystem->GetUserSettings();
+	if (!UserSetting)return;
+
+	//键盘/鼠标
+	{
+		UYCNListDataObject_Collection* KeyboardMouseCategory = NewObject<UYCNListDataObject_Collection>();
+		KeyboardMouseCategory->SetDataID(FName("KeyboardMouseCategory"));
+		KeyboardMouseCategory->SetDataDisplayName(FText::FromString(TEXT("键盘/鼠标")));
+
+		ControlTab->AddDataToChildDataList(KeyboardMouseCategory);
+
+		//键盘/鼠标输入
+		{
+			FPlayerMappableKeyQueryOptions KeyboardMouseOnly;
+			KeyboardMouseOnly.KeyToMatch = EKeys::S;
+			KeyboardMouseOnly.bMatchBasicKeyTypes = true;
+
+			for (const TPair<FGameplayTag, UEnhancedPlayerMappableKeyProfile*>& ProfilePair : UserSetting->GetAllSavedKeyProfiles())
+			{
+				UEnhancedPlayerMappableKeyProfile* MappableKeyProfile = ProfilePair.Value;
+				if (!MappableKeyProfile)return;
+				for (const TPair<FName, FKeyMappingRow>& MappingRowPair : MappableKeyProfile->GetPlayerMappingRows())
+				{
+					for (const FPlayerKeyMapping& KeyMapping : MappingRowPair.Value.Mappings)
+					{
+						if (MappableKeyProfile->DoesMappingPassQueryOptions(KeyMapping, KeyboardMouseOnly))
+						{
+							Debug::Print(FString::Printf(TEXT("映射ID: %s; 显示名称: %s; 绑定键: %s;"),
+								*KeyMapping.GetMappingName().ToString(),
+								*KeyMapping.GetDisplayName().ToString(),
+								*KeyMapping.GetCurrentKey().GetDisplayName().ToString()));
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
