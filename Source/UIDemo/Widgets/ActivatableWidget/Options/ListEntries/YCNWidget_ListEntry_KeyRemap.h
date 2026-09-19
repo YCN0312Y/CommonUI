@@ -4,38 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/ListEntries/YCNWidget_ListEntry_Base.h"
-#include "YCNWidget_ListEntry_Scalar.generated.h"
+#include "YCNWidget_ListEntry_KeyRemap.generated.h"
 
-class UCommonNumericTextBlock;
-class UAnalogSlider;
-class UYCNListDataObject_Scalar;
+class UYCNCommonButtonBase;
+class UYCNListDataObject_KeyRemap;
 
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
-class UIDEMO_API UYCNWidget_ListEntry_Scalar : public UYCNWidget_ListEntry_Base
+class UIDEMO_API UYCNWidget_ListEntry_KeyRemap : public UYCNWidget_ListEntry_Base
 {
 	GENERATED_BODY()
 	
 protected:
-	virtual void NativeOnInitialized()override;
 	//当前条目被分配了一个列表数据对象
-	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject)override;
+	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject)override;	
 	//当前条目关联的数据被修改
 	virtual void OnOwningListDataObjectModified(UYCNListDataObject_Base* InOwningModifiedData, EOptionsListDataModifyReason InModifyReason)override;
-
 private:
+	//键位映射
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-	TObjectPtr<UCommonNumericTextBlock>CommonNumeric_SettingValue;
-
+	TObjectPtr<UYCNCommonButtonBase>CommonButton_RemapKey;
+	//重置键位绑定
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-	TObjectPtr<UAnalogSlider>AnalogSlider_SettingSlider;
+	TObjectPtr<UYCNCommonButtonBase>CommonButton_ResetKeyBinding;
 
-	//缓存拥有的标量数据对象
 	UPROPERTY(Transient)
-	TObjectPtr<UYCNListDataObject_Scalar>CachedOwningScalarDataObject;
-
-private:
-	UFUNCTION()
-	void OnSettingSliderValueChanged(float NewValue);
-	UFUNCTION()
-	void OnSettingSliderMouseCaptureBegin();
+	TObjectPtr<UYCNListDataObject_KeyRemap>CachedOwningKeyRemapDataObject;
 };

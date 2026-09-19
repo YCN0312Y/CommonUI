@@ -5,6 +5,7 @@
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_String.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Scalar.h"
 #include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_Resolution.h"
+#include "UIDemo/Widgets/ActivatableWidget/Options/DataObjects/YCNListDataObject_KeyRemap.h"
 #include "UIDemo/Msic/YCNOptionsDataInteractionHelper.h"
 #include "UIDemo/FunctionLibrary/YCNFunctionLibrary.h"
 #include "UIDemo/GameplayTags/YCNGameplayTags.h"
@@ -655,10 +656,12 @@ void UYCNOptionsDataRegistry::InitControlCollectionTab(ULocalPlayer* InOwningLoc
 					{
 						if (MappableKeyProfile->DoesMappingPassQueryOptions(KeyMapping, KeyboardMouseOnly))
 						{
-							Debug::Print(FString::Printf(TEXT("映射ID: %s; 显示名称: %s; 绑定键: %s;"),
-								*KeyMapping.GetMappingName().ToString(),
-								*KeyMapping.GetDisplayName().ToString(),
-								*KeyMapping.GetCurrentKey().GetDisplayName().ToString()));
+							UYCNListDataObject_KeyRemap* KeyRemapDataObject = NewObject<UYCNListDataObject_KeyRemap>();
+							KeyRemapDataObject->SetDataID(KeyMapping.GetMappingName());
+							KeyRemapDataObject->SetDataDisplayName(KeyMapping.GetDisplayName());
+							KeyRemapDataObject->InitKeyRemapData(UserSetting, MappableKeyProfile, ECommonInputType::MouseAndKeyboard, KeyMapping);
+
+							KeyboardMouseCategory->AddDataToChildDataList(KeyRemapDataObject);
 						}
 					}
 				}

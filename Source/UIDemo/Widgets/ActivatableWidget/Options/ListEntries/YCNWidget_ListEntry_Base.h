@@ -36,9 +36,9 @@ protected:
 	virtual void OnOwningDependencyDataObjectModified(UYCNListDataObject_Base* InOwningModifiedDependencyData, EOptionsListDataModifyReason InModifyReason);
 
 private:
+	//选项显示名
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, AllowPrivateAccess = "true"))
 	TObjectPtr<UCommonTextBlock>CommonText_SettingDisplayName;
-
 	UPROPERTY()
 	UYCNListDataObject_Base* CachedOwningDataObject;
 

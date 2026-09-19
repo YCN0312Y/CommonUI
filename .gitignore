@@ -3,6 +3,7 @@ Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
+Build
 
 # 每用户编辑器设置，不应提交
 Config/DefaultEditorPerProjectUserSettings.ini

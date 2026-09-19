@@ -7,6 +7,7 @@
 #include "YCNCommonButtonBase.generated.h"
 
 class UCommonTextBlock;
+class UCommonLazyImage;
 
 UCLASS(Abstract, BlueprintType, meta = (DisableNativeTick))
 class UIDEMO_API UYCNCommonButtonBase : public UCommonButtonBase
@@ -22,6 +23,9 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UCommonTextBlock>CommonText_ButtonText;
+	//按键图标
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, AllowPrivateAccess = "true"))
+	TObjectPtr<UCommonLazyImage>CommonImage_ButtonImage;
 
 	//按钮显示文本
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "YCN Button", meta = (AllowPrivateAccess = "true"))
@@ -34,6 +38,8 @@ public:
 	//设置按钮文本
 	UFUNCTION(BlueprintCallable, Category = "YCN Button")
 	void SetButtonText(const FText& InText);
+	UFUNCTION(BlueprintCallable, Category = "YCN Button")
+	void SetButtonImage(const FSlateBrush& InBrush);
 
 	FText GetButtonDisplayText()const;
 };

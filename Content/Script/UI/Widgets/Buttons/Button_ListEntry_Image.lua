@@ -10,7 +10,6 @@
 local M = UnLua.Class()
 
 function M:OnInitialized()
-
     local ButtonImage = self.CommonImage_ButtonImage
     local ButtonImageStyle = self.ButtonImageStyle
     local DefaultButtonImageColor = self.DefaultButtonImageColor
@@ -18,15 +17,18 @@ function M:OnInitialized()
     if ButtonImage and ButtonImageStyle and DefaultButtonImageColor then
         ButtonImage:SetBrushFromLazyTexture(ButtonImageStyle, false)
         ButtonImage:SetColorAndOpacity(DefaultButtonImageColor)
-    end
 
+    end
 end
 
---function M:PreConstruct(IsDesignTime)
---end
-
--- function M:Construct()
+-- function M:PreConstruct(IsDesignTime)
 -- end
+
+function M:Construct()
+    if self.CommonImage_ButtonImage then
+        self.CommonImage_ButtonImage:SetDesiredSizeOverride(self.ButtonImageSize)
+    end
+end
 
 --function M:Tick(MyGeometry, InDeltaTime)
 --end

@@ -1,8 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UIDemo/Widgets/Components/YCNCommonButtonBase.h"
-#include "CommonTextBlock.h"
 #include "UIDemo/Subsystems/YCNWidgetSubsystem.h"
+#include "CommonTextBlock.h"
+#include "CommonLazyImage.h"
 
 void UYCNCommonButtonBase::NativePreConstruct()
 {
@@ -45,6 +46,13 @@ void UYCNCommonButtonBase::SetButtonText(const FText& InText)
 	{
 		CommonText_ButtonText->SetText(InText);
 	}
+}
+
+void UYCNCommonButtonBase::SetButtonImage(const FSlateBrush& InBrush)
+{
+	if (!CommonImage_ButtonImage)return;
+
+	CommonImage_ButtonImage->SetBrush(InBrush);
 }
 
 FText UYCNCommonButtonBase::GetButtonDisplayText() const
