@@ -165,14 +165,6 @@ void UYCNWidget_Options::OnOptionsTabSelected(FName TabID)
 
 	// 在替换数据前清除旧选择和自定义高亮，不依赖条目回收事件。
 	CommonListView_OptionsList->ClearSelection();
-	for (UUserWidget* DisplayedEntry : CommonListView_OptionsList->GetDisplayedEntryWidgets())
-	{
-		if (UYCNWidget_ListEntry_Base* Entry = Cast<UYCNWidget_ListEntry_Base>(DisplayedEntry))
-		{
-			Entry->BP_OnListEntryWidgetHovered(false, false);
-			Entry->BP_OnListEntryWidgetSelectionChanged(false);
-		}
-	}
 	DetailsView_ListEntryInfo->ClearDetailsViewInfo();
 	//找到的已注册的源项
 	TArray<UYCNListDataObject_Base*>FoundListSourceItems = GetOwningDataRegistry()->GetListSourceItemBySelectedTabID(TabID);
@@ -249,9 +241,7 @@ void UYCNWidget_Options::OnOptionsEntryWidgetGenerated(UUserWidget& InGeneratedI
 	//对每个生成或复用的条目同步实际选中状态，包括未选中的条目。
 	if (UYCNWidget_ListEntry_Base* Entry = Cast<UYCNWidget_ListEntry_Base>(&InGeneratedItem))
 	{
-		const bool bIsSelected = Entry->IsListItemSelected();
-		Entry->BP_OnListEntryWidgetHovered(false, bIsSelected);
-		Entry->BP_OnListEntryWidgetSelectionChanged(bIsSelected);
+		Entry->NativeOnListEntryWidgetHovered(false);
 	}
 
 	//获取当前选择的子控件的数据

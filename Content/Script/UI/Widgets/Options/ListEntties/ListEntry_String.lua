@@ -21,21 +21,8 @@ local M = UnLua.Class()
 --function M:Tick(MyGeometry, InDeltaTime)
 --end
 
---子标题选中时调用
-function M:BP_OnListEntryWidgetSelectionChanged(bIsSelected)
-    --条目控件会被列表池化复用，缓存的 bEntryHovered 可能是上一个标签页遗留的，
-    --这里以控件自身的真实悬停状态重新同步一次
-    self.bEntryHovered = self:IsHovered() == true
-    self:ToggleHighLightState(bIsSelected or self.bEntryHovered)
-end
+function M:BP_OnToggleEntryWidgetHighLightState(bIsSelected)
 
-function M:BP_OnListEntryWidgetHovered(bWasHovered, bIsEntryWidgetStillSelected)
-    self.bEntryHovered = bWasHovered
-    --（选中/悬停）那就高亮
-    self:ToggleHighLightState(bWasHovered or bIsEntryWidgetStillSelected)
-end
-
-function M:ToggleHighLightState(ShouldHighLight)
     --旋转器
     local AvailableOptions = self.CommonRotator_AvailableOptions
     local MyText
@@ -58,7 +45,7 @@ function M:ToggleHighLightState(ShouldHighLight)
         local HighLight = self.HighLightTextStyle
 
         if HighLight and HighLight then
-            if ShouldHighLight then
+            if bIsSelected then
                 SettingDisplayName:SetStyle(HighLight)
                 MyText:SetStyle(HighLight)
             else
@@ -66,9 +53,10 @@ function M:ToggleHighLightState(ShouldHighLight)
                 MyText:SetStyle(Default)
             end
         end
-        Last:TaggleButtonImageHighLight(ShouldHighLight)
-        Next:TaggleButtonImageHighLight(ShouldHighLight)
+        Last:TaggleButtonImageHighLight(bIsSelected)
+        Next:TaggleButtonImageHighLight(bIsSelected)
     end
+    
 end
 
 return M

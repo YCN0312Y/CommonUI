@@ -31,21 +31,7 @@ end
 --function M:Tick(MyGeometry, InDeltaTime)
 --end
 
---子标题选中时调用
-function M:BP_OnListEntryWidgetSelectionChanged(bIsSelected)
-    
-    self:ToggleHighLightState(bIsSelected)
-end
-
-function M:BP_OnListEntryWidgetHovered(bWasHovered, bIsEntryWidgetStillSelected)
-
-    if bWasHovered or not bIsEntryWidgetStillSelected then
-        self:ToggleHighLightState(bWasHovered)
-    end
-    
-end
-
-function M:ToggleHighLightState(ShouldHighLight)
+function M:BP_OnToggleEntryWidgetHighLightState(bIsSelected)
 
     --设置文本样式
     local SettingDisplayName = self.CommonText_SettingDisplayName
@@ -57,7 +43,7 @@ function M:ToggleHighLightState(ShouldHighLight)
         local HighLightStyle = self.HighLightTextStyle
 
         if DefaultStyle and HighLightStyle then
-            if ShouldHighLight then
+            if bIsSelected then
                 SettingDisplayName:SetStyle(HighLightStyle)
                 SettingValue:SetStyle(HighLightStyle)
             else
@@ -72,11 +58,12 @@ function M:ToggleHighLightState(ShouldHighLight)
     local SettingSlider = self.AnalogSlider_SettingSlider
 
     if SettingSlider and HighLightColor and DefaultColor then
-        if ShouldHighLight then
+        if bIsSelected then
             SettingSlider:SetSliderBarColor(HighLightColor)
         else
             SettingSlider:SetSliderBarColor(DefaultColor)
         end
     end
 end
+
 return M

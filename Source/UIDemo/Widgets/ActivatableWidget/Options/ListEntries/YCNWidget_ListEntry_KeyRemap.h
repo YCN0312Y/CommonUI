@@ -15,6 +15,7 @@ class UIDEMO_API UYCNWidget_ListEntry_KeyRemap : public UYCNWidget_ListEntry_Bas
 	GENERATED_BODY()
 	
 protected:
+	virtual void NativeOnInitialized()override;
 	//当前条目被分配了一个列表数据对象
 	virtual void OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject)override;	
 	//当前条目关联的数据被修改
@@ -29,4 +30,11 @@ private:
 
 	UPROPERTY(Transient)
 	TObjectPtr<UYCNListDataObject_KeyRemap>CachedOwningKeyRemapDataObject;
+
+private:
+	/*
+	* CommonButton_RemapKey
+	*/
+	void OnClickedRemapKey();
+	void OnResetKeyBindingClicked();
 };

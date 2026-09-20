@@ -17,12 +17,19 @@ void UYCNWidget_ListEntry_Base::NativeOnListItemObjectSet(UObject* ListItemObjec
 void UYCNWidget_ListEntry_Base::NativeOnItemSelectionChanged(bool bIsSelected)
 {
 	IUserObjectListEntry::NativeOnItemSelectionChanged(bIsSelected);
-	BP_OnListEntryWidgetSelectionChanged(bIsSelected);
+	BP_OnToggleEntryWidgetHighLightState(bIsSelected);
 }
 
 void UYCNWidget_ListEntry_Base::NativeOnListEntryWidgetHovered(bool bWasHovered)
 {
-	BP_OnListEntryWidgetHovered(bWasHovered, IsListItemSelected());
+	if (bWasHovered)
+	{
+		BP_OnToggleEntryWidgetHighLightState(true);
+	}
+	else
+	{
+		BP_OnToggleEntryWidgetHighLightState(GetListItem() && IsListItemSelected() ? true : false);
+	}
 }
 
 void UYCNWidget_ListEntry_Base::OnOwningListDataObjectSet(UYCNListDataObject_Base* InOwningListDataObject)

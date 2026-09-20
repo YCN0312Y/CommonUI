@@ -32,7 +32,6 @@ protected:
 	//设置数据是否被禁用
 	virtual void OnToggleEditableState(bool bIsEditable);
 
-
 	virtual void OnOwningDependencyDataObjectModified(UYCNListDataObject_Base* InOwningModifiedDependencyData, EOptionsListDataModifyReason InModifyReason);
 
 private:
@@ -44,12 +43,10 @@ private:
 
 protected:
 	void SelectThisEntryWidget();
+	//蓝图调用切换条目小部件高亮状态
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Toggle Entry Widget High Light State"))
+	void BP_OnToggleEntryWidgetHighLightState(bool bShouldHighLight)const;
 public:
-	//蓝图调用选择标签函数
-	UFUNCTION(BlueprintImplementableEvent)
-	void BP_OnListEntryWidgetSelectionChanged(bool bIsSelected);
 	//蓝图调用悬停标签函数
-	UFUNCTION(BlueprintImplementableEvent)
-	void BP_OnListEntryWidgetHovered(bool bWasHovered, bool bIsEntryWidgetStillSelected);
 	void NativeOnListEntryWidgetHovered(bool bWasHovered);
 };

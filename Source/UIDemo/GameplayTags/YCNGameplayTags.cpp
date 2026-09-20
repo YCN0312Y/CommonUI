@@ -15,6 +15,7 @@ namespace YCNGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_MainMenu, "YCN.Widget.MainMenu");
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_Confirm, "YCN.Widget.Confirm");
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_Option, "YCN.Widget.Option");
+	UE_DEFINE_GAMEPLAY_TAG(YCN_Widget_KeyRemap, "YCN.Widget.KeyRemap");
 
 	//Options Image
 	UE_DEFINE_GAMEPLAY_TAG(YCN_Image_TestImage, "YCN.Image.TextImage");
