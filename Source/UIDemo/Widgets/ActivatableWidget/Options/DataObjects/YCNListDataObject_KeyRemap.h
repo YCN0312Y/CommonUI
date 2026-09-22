@@ -41,4 +41,7 @@ private:
 
 private:
 	FPlayerKeyMapping* GetOwningKeyMapping()const;
+
+public:
+	FORCEINLINE ECommonInputType GetCachedDesiredInputKeyType()const { return CachedDesiredInputKeyType; }
 };
