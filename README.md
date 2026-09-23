@@ -67,3 +67,6 @@
 
 9月23<br>
 （08-18）添加了继承自“IInputProcessor”的“FKeyRemapInputPreprocessor”输入处理器类。
+
+9月24日<br>
+（08-21）添加了一些“按键”委托和“取消按键”委托。

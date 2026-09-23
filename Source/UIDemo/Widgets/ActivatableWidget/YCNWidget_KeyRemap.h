@@ -28,10 +28,24 @@ private:
 	TSharedPtr<FKeyRemapInputPreprocessor>CachedInputPreprocessor;
 	//缓存期望输入类型
 	ECommonInputType CachedDesiredInputType;
+public:
+	DECLARE_DELEGATE_OneParam(FOnKeyRemapKeyPressed, const FKey&);
+	FOnKeyRemapKeyPressed OnKeyRemapKeyPressed;
 
+	DECLARE_DELEGATE_OneParam(FOnKeyRemapKeySelectCanceled, const FString&);
+	FOnKeyRemapKeySelectCanceled OnKeyRemapKeySelectCanceled;
+
+private:
+	void OnValidKeyPressedDelected(const FKey& InPressedKey);
+
+	void OnKeySelectCanceled(const FString& CanceledReason);
+
+	//请求请用控件
+	void RequestDeactivateWidget(TFunction<void()>PreDectivateCallback);
 public:
 	void SetCachedDesiredInputType(ECommonInputType InDesiredInputType);
 	ECommonInputType GetCachedDesiredInputType()const { return CachedDesiredInputType; }
+
 };
 
 class FKeyRemapInputPreprocessor : public IInputProcessor
@@ -50,4 +64,14 @@ protected:
 private:
 	//缓存输入类型
 	ECommonInputType CachedInputType;
+
+public:
+	DECLARE_DELEGATE_OneParam(FOnInputPreProcessorKeyPressed, const FKey&);
+	FOnInputPreProcessorKeyPressed OnInputPreProcessorKeyPressed;
+
+	DECLARE_DELEGATE_OneParam(FOnInputPreProcessorKeySelectCanceled, const FString&);
+	FOnInputPreProcessorKeySelectCanceled OnInputPreProcessorKeySelectCanceled;
+
+protected:
+	void ProcessPressedKey(const FKey& InPressedKey);
 };
