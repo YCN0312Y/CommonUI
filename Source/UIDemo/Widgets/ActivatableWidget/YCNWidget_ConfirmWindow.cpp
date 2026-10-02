@@ -68,21 +68,8 @@ void UYCNWidget_ConfirmWindow::InitConfirmWindow(UYCNConfirmWindowInfoObject* In
 
 	for (const FConfirmWindowButtonInfo& AvailableButtonInfo : InWindowInfoObject->AvailableWindowButton)
 	{
-		FDataTableRowHandle InputActionRowHandle;
-
-		switch (AvailableButtonInfo.ConfirmWindowButtonType)
-		{
-		case EConfirmWindowButtonType::Closed:
-			//默认返回键
-			InputActionRowHandle = ICommonInputModule::GetSettings().GetDefaultBackAction();
-			break;
-		case EConfirmWindowButtonType::Cencel:
-			InputActionRowHandle = ICommonInputModule::GetSettings().GetDefaultBackAction();
-			break;
-		}
 		UYCNCommonButtonBase* AddedButton = DynamicEntryBox_Buttons->CreateEntry<UYCNCommonButtonBase>();//创建条目
 		AddedButton->SetButtonText(AvailableButtonInfo.ButtonDisplayText);
-		AddedButton->SetTriggeringInputAction(InputActionRowHandle);//设置
 		AddedButton->OnClicked().AddLambda(
 			[this, ClickedButtonCallback, AvailableButtonInfo]()
 			{

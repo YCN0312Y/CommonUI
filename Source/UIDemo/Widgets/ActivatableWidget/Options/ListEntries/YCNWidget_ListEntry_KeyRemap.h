@@ -37,4 +37,7 @@ private:
 	*/
 	void OnClickedRemapKey();
 	void OnResetKeyBindingClicked();
+
+	void OnKeyToRemapPressed(const FKey& PressedKey);
+	void OnKeyToRemapCanceled(const FString& CanceledReason);
 };

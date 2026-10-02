@@ -38,6 +38,8 @@ void UYCNWidget_ListEntry_KeyRemap::OnOwningListDataObjectModified(UYCNListDataO
 
 void UYCNWidget_ListEntry_KeyRemap::OnClickedRemapKey()
 {
+	SelectThisEntryWidget();
+
 	UYCNWidgetSubsystem::Get(this)->PushSoftWidgetToStackAynsc(
 		YCNGameplayTags::YCN_WidgetStack_Modal,
 		UYCNFunctionLibrary::GetSoftWidgetClassByTag(YCNGameplayTags::YCN_Widget_KeyRemap),
@@ -46,6 +48,9 @@ void UYCNWidget_ListEntry_KeyRemap::OnClickedRemapKey()
 			if (PushState == EAsyncPushWidgetState::CreateWidget)
 			{
 				UYCNWidget_KeyRemap* CreatedKeyRemap = Cast<UYCNWidget_KeyRemap>(PushWidget);
+				CreatedKeyRemap->OnKeyRemapKeyPressed.BindUObject(this, &UYCNWidget_ListEntry_KeyRemap::OnKeyToRemapPressed);
+				CreatedKeyRemap->OnKeyRemapCanceled.BindUObject(this, &UYCNWidget_ListEntry_KeyRemap::OnKeyToRemapCanceled);
+
 				if (CreatedKeyRemap)
 				{
 					if (CachedOwningKeyRemapDataObject)
@@ -60,5 +65,44 @@ void UYCNWidget_ListEntry_KeyRemap::OnClickedRemapKey()
 
 void UYCNWidget_ListEntry_KeyRemap::OnResetKeyBindingClicked()
 {
+	SelectThisEntryWidget();
 
+	if (CachedOwningKeyRemapDataObject && !CachedOwningKeyRemapDataObject->CanResetBackToDefaultVaule())
+	{
+		UYCNWidgetSubsystem::Get(this)->PushConfirmWindowToModalStackAynsc(
+			EConfirmWindowType::OK,
+			FText::FromString(TEXT("重置按键")),
+			FText::FromString(CachedOwningKeyRemapDataObject->GetDataDisplayName().ToString() + TEXT("已是默认设置")),
+			[](EConfirmWindowButtonType InButtonType) {});
+		return;
+	}
+
+	UYCNWidgetSubsystem::Get(this)->PushConfirmWindowToModalStackAynsc(
+		EConfirmWindowType::YesNo,
+		FText::FromString(TEXT("重置按键")),
+		FText::FromString(TEXT("确定要重置") + CachedOwningKeyRemapDataObject->GetDataDisplayName().ToString() + TEXT("的默认设置吗")),
+		[this](EConfirmWindowButtonType InButtonType) 
+		{
+			if (InButtonType == EConfirmWindowButtonType::Confirm)
+			{
+				CachedOwningKeyRemapDataObject->TryResetBackToDefaultVaule();
+			}
+		});
+}
+
+void UYCNWidget_ListEntry_KeyRemap::OnKeyToRemapPressed(const FKey& PressedKey)
+{
+	if (CachedOwningKeyRemapDataObject)
+	{
+		CachedOwningKeyRemapDataObject->BindNewInputKey(PressedKey);
+	}
+}
+
+void UYCNWidget_ListEntry_KeyRemap::OnKeyToRemapCanceled(const FString& CanceledReason)
+{
+	UYCNWidgetSubsystem::Get(this)->PushConfirmWindowToModalStackAynsc(
+		EConfirmWindowType::OK,
+		FText::FromString(TEXT("按键")),
+		FText::FromString(CanceledReason),
+		[](EConfirmWindowButtonType InButtonType){});
 }

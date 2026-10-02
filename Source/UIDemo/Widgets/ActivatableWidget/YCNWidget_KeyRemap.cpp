@@ -10,8 +10,8 @@ void UYCNWidget_KeyRemap::NativeOnActivated()
 	Super::NativeOnActivated();
 
 	CachedInputPreprocessor = MakeShared<FKeyRemapInputPreprocessor>(CachedDesiredInputType);
-	CachedInputPreprocessor->OnInputPreProcessorKeyPressed.BindUObject(this, &UYCNWidget_KeyRemap::OnValidKeyPressedDelected);
-	CachedInputPreprocessor->OnInputPreProcessorKeySelectCanceled.BindUObject(this, &UYCNWidget_KeyRemap::OnKeySelectCanceled);
+	CachedInputPreprocessor->OnKeyPressed.BindUObject(this, &UYCNWidget_KeyRemap::OnKeyPressed);
+	CachedInputPreprocessor->OnKeyCanceled.BindUObject(this, &UYCNWidget_KeyRemap::OnKeyCanceled);
 	FSlateApplication::Get().RegisterInputPreProcessor(CachedInputPreprocessor, 1);
 
 	FString InputDeviceName;
@@ -42,7 +42,8 @@ void UYCNWidget_KeyRemap::NativeOnDeactivated()
 	
 }
 
-void UYCNWidget_KeyRemap::OnValidKeyPressedDelected(const FKey& InPressedKey)
+// 已按下
+void UYCNWidget_KeyRemap::OnKeyPressed(const FKey& InPressedKey)
 {
 	RequestDeactivateWidget(
 		[this, InPressedKey]()
@@ -51,21 +52,22 @@ void UYCNWidget_KeyRemap::OnValidKeyPressedDelected(const FKey& InPressedKey)
 		});
 }
 
-void UYCNWidget_KeyRemap::OnKeySelectCanceled(const FString& CanceledReason)
+// 取消按下
+void UYCNWidget_KeyRemap::OnKeyCanceled(const FString& CanceledReason)
 {
 	RequestDeactivateWidget(
 		[this, CanceledReason]()
 		{
-			OnKeyRemapKeySelectCanceled.ExecuteIfBound(CanceledReason);
+			OnKeyRemapCanceled.ExecuteIfBound(CanceledReason);
 		});
 }
 
-void UYCNWidget_KeyRemap::RequestDeactivateWidget(TFunction<void()>PreDectivateCallback)
+void UYCNWidget_KeyRemap::RequestDeactivateWidget(TFunction<void()>PreDeactivateCallback)
 {
 	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda(
-		[PreDectivateCallback, this](float DeltaTime)->bool
+		[PreDeactivateCallback, this](float DeltaTime)->bool
 		{
-			PreDectivateCallback();
+			PreDeactivateCallback();
 
 			DeactivateWidget();
 			return false;
@@ -107,7 +109,7 @@ void FKeyRemapInputPreprocessor::ProcessPressedKey(const FKey& InPressedKey)
 {
 	if (InPressedKey == EKeys::Escape)
 	{
-		OnInputPreProcessorKeySelectCanceled.ExecuteIfBound(TEXT("按键设置已取消"));
+		OnKeyCanceled.ExecuteIfBound(TEXT("按键设置已取消"));
 		return;
 	}
 
@@ -116,11 +118,12 @@ void FKeyRemapInputPreprocessor::ProcessPressedKey(const FKey& InPressedKey)
 	case ECommonInputType::MouseAndKeyboard:
 		if (InPressedKey.IsGamepadKey())
 		{
-			OnInputPreProcessorKeySelectCanceled.ExecuteIfBound(TEXT("检测到按下的是游戏手柄"));
+			//判断用户按下的是否是游戏手柄
+			OnKeyCanceled.ExecuteIfBound(TEXT("检测到按下的是游戏手柄"));
 			return;
 		}
 		break;
 	}
 
-	OnInputPreProcessorKeyPressed.ExecuteIfBound(InPressedKey);
+	OnKeyPressed.ExecuteIfBound(InPressedKey);
 }

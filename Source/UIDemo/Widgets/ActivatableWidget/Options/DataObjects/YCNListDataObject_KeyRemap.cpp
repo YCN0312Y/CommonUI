@@ -39,6 +39,29 @@ FSlateBrush UYCNListDataObject_KeyRemap::GetIconFromCurrentKey() const
 	return FSlateBrush();
 }
 
+bool UYCNListDataObject_KeyRemap::HasDefaultValue() const
+{
+	return GetOwningKeyMapping()->GetDefaultKey().IsValid();
+}
+
+bool UYCNListDataObject_KeyRemap::CanResetBackToDefaultVaule() const
+{
+	//IsCustomized如果当前的按键 != 默认键就返回真
+	return HasDefaultValue() && GetOwningKeyMapping()->IsCustomized();
+}
+
+bool UYCNListDataObject_KeyRemap::TryResetBackToDefaultVaule()
+{
+	if (CanResetBackToDefaultVaule() && CachedOwningInputUserSettings)
+	{
+		GetOwningKeyMapping()->ResetToDefault();
+		CachedOwningInputUserSettings->SaveSettings();
+		NotifyListDataModified(this, EOptionsListDataModifyReason::ResetToDefault);
+		return true;
+	}
+	return false;
+}
+
 FPlayerKeyMapping* UYCNListDataObject_KeyRemap::GetOwningKeyMapping() const
 {
 	if (CachedOwningKeyProfile)
@@ -49,4 +72,19 @@ FPlayerKeyMapping* UYCNListDataObject_KeyRemap::GetOwningKeyMapping() const
 		return CachedOwningKeyProfile->FindKeyMapping(KeyArgs);
 	}
 	return nullptr;
+}
+
+void UYCNListDataObject_KeyRemap::BindNewInputKey(const FKey& InNewKey)
+{
+	if (!CachedOwningInputUserSettings)return;
+
+	FMapPlayerKeyArgs KeyArgs;
+	KeyArgs.MappingName = CachedOwningMappingName;
+	KeyArgs.Slot = CachedOwningMappableKeySlot;
+	KeyArgs.NewKey = InNewKey;
+
+	FGameplayTagContainer Container;
+	CachedOwningInputUserSettings->MapPlayerKey(KeyArgs, Container);
+	CachedOwningInputUserSettings->SaveSettings();
+	NotifyListDataModified(this);
 }

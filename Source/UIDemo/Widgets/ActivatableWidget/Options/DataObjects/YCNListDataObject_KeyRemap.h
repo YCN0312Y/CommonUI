@@ -25,6 +25,15 @@ public:
 		const FPlayerKeyMapping& InOwningPlayerKeyMapping);
 
 	FSlateBrush GetIconFromCurrentKey()const;
+
+	//是否有值可以重置
+	virtual bool HasDefaultValue()const override;
+
+	//可重置为默认值
+	virtual bool CanResetBackToDefaultVaule()const override;
+
+	//尝试重置为默认值
+	virtual bool TryResetBackToDefaultVaule() override;
 private:
 	//缓存拥有的输入用户设置
 	UPROPERTY(Transient)
@@ -43,5 +52,7 @@ private:
 	FPlayerKeyMapping* GetOwningKeyMapping()const;
 
 public:
+	void BindNewInputKey(const FKey& InNewKey);
+
 	FORCEINLINE ECommonInputType GetCachedDesiredInputKeyType()const { return CachedDesiredInputKeyType; }
 };
