@@ -34,12 +34,16 @@ local M = UnLua.Class()
 -- function M:ReceiveActorEndOverlap(OtherActor)
 -- end
 
-function M:ReceivePossess(PossessedPawn)
+function M:OnLoadingScreenActivated()
 
-    
+end
+
+-- 加载界面移除时收到通知
+function M:OnLoadingScreenDeactivated()
+
     local EnhancedInputLocalPlayerSubsytem = UE.USubsystemBlueprintLibrary.GetLocalPlayerSubsystem(self, UE.UEnhancedInputLocalPlayerSubsystem)
     if EnhancedInputLocalPlayerSubsytem then
-        print("1")
+        
         local UserSettings = EnhancedInputLocalPlayerSubsytem:GetUserSettings()
         if UserSettings and self.IMC_Default then
             UserSettings:RegisterInputMappingContext(self.IMC_Default)
@@ -75,7 +79,6 @@ function M:ReceivePossess(PossessedPawn)
 
         end
     end
-
 end
 
 return M

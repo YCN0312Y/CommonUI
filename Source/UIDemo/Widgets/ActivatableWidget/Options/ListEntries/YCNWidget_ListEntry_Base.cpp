@@ -66,7 +66,8 @@ void UYCNWidget_ListEntry_Base::OnOwningDependencyDataObjectModified(UYCNListDat
 {
 	if (!InOwningModifiedDependencyData || !CachedOwningDataObject)return;
 
-	OnToggleEditableState(InOwningModifiedDependencyData->IsCurrentDataDisabled());
+	//依赖的数据变了，要重新判断的是「自己这一行」的禁用状态，不是那个依赖自己的项
+	OnToggleEditableState(CachedOwningDataObject->IsCurrentDataDisabled());
 }
 
 void UYCNWidget_ListEntry_Base::SelectThisEntryWidget()

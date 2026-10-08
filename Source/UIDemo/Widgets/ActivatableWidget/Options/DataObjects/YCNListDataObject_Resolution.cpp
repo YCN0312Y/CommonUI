@@ -9,7 +9,8 @@ void UYCNListDataObject_Resolution::OnDataObjectInitialized()
 {
 	Super::OnDataObjectInitialized();
 
-	if (!TrySetDisplayTextFromStringValue(MaxResolution))
+	//基类已经按 getter 的值找到对应文本；找不到时（当前分辨率不在全屏分辨率列表里）直接显示数值
+	if (!TrySetDisplayTextFromStringValue(CurrentStringValue))
 	{
 		CurrentTextValue = ResToValueText(UYCNGameUserSettings::Get()->GetScreenResolution());
 	}
@@ -40,8 +41,8 @@ void UYCNListDataObject_Resolution::InitResolutionValue()
 
 FString UYCNListDataObject_Resolution::ResToValueString(const FIntPoint& InResolution)
 {
-	//X=1920, Y=1080
-	return FString::Printf(TEXT("%i x %i)"), InResolution.X, InResolution.Y);
+	//这个字符串会被 PropertyPathHelpers 解析成 SetScreenResolution 的参数，必须是 FIntPoint 的文本格式
+	return FString::Printf(TEXT("(X=%i,Y=%i)"), InResolution.X, InResolution.Y);
 }
 
 FText UYCNListDataObject_Resolution::ResToValueText(const FIntPoint& InResolution)

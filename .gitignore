@@ -5,6 +5,10 @@ Intermediate/
 Saved/
 Build
 
+# UBT / NuGet 中间产物（每次构建重新生成，且含本机绝对路径）
+[Bb]in/
+[Oo]bj/
+
 # 每用户编辑器设置，不应提交
 Config/DefaultEditorPerProjectUserSettings.ini
 *.pdb

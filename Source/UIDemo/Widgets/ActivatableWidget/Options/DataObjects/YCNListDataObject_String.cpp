@@ -61,6 +61,8 @@ bool UYCNListDataObject_String::CanSetDisableValue(const FString& InForcedValue)
 void UYCNListDataObject_String::OnSetDisableValue(const FString& InForcedValue)
 {
 	CurrentStringValue = InForcedValue;
+	//同步显示文本，否则界面上会一直停留在禁用前的那个文本
+	TrySetDisplayTextFromStringValue(CurrentStringValue);
 
 	TryResetBackToDefaultVaule();
 	if (DataDynamciSetter)

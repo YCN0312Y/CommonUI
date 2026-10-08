@@ -14,10 +14,10 @@ class UIDEMO_API UYCNLoadingScreenSettings : public UDeveloperSettings
 public:
 	UPROPERTY(Config, EditAnywhere, Category = "Loading Screen Settings")
 	TSoftClassPtr<UUserWidget>LoadingScreenWidgetClass;
-
+	//在加载完成之后，额外让 Loading Screen 保持显示多少秒
 	UPROPERTY(Config, EditAnywhere, Category = "Loading Screen Settings")
 	float HoldLoadingScreenExtraSeconds = 3.f;
-
+	//在编辑器中是否应该显示 Loading Screen
 	UPROPERTY(Config, EditAnywhere, Category = "Loading Screen Settings")
 	bool bShouldLoadingScreenInEditor = false;
 
