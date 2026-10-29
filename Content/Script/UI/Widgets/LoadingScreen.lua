@@ -38,10 +38,6 @@ function M:Destruct()
     self.LoadingScreenSubsystem = nil
 end
 
-function M:OnActivated()
-    AboutDisplayString = "About"
-end
-
 function M:OnLoadingReasonUpdateEvent(CurrendLoadingReason)
     if self.CommonText_LoadingReason then
         local Text = UE.UKismetTextLibrary.Conv_StringToText(CurrendLoadingReason)
